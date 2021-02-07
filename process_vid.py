@@ -11,9 +11,22 @@ class Frame:
     
 
 class Mozavid:
-    def __init__(self, vid_path, target_frame, recursion_level):
+    def __init__(self, vid_path, target_frame_idx, recursion_level):
+        
+        # checks
+        if not isinstance(recursion_level, int) or recursion_level <= 0:
+            print('recursion level has to be an integer above 0')
+            exit(1)
+
+        # target frame nem létezik
+
+        # útvonalon nem létezik mp4
+
         self.vidcap = cv2.VideoCapture(vid_path)
-        self.target_frame = target_frame
+
+        # the frame to be recreated
+        self.target_frame_idx = target_frame_idx
+        # the target frame is split recursively this many times into quarters
         self.recursion_level = recursion_level
 
         
@@ -24,10 +37,40 @@ class Mozavid:
             by one of the (downsized)frames. Which frame u ask?
             One whoose histogram is similar enough to the tile """
 
-        print(frames[self.target_frame].image.shape)
+        target_frame = frames[self.target_frame_idx]
+        shape = target_frame.image.shape
+
+        # this is how many times the edges of the target frame
+        # are split into equal length sections
+        split_level = 2 ** self.recursion_level
+
+        height = shape[0] // (split_level)
+        width = shape[1] // (split_level)
+        tile_resolution = (height, width)
+
+        #DEBUG
+        print(height)
+        print(width)
+        print(tile_resolution)
+
+        tiles = []
+        count = 0
+        for i in range(split_level):
+            for j in range(split_level):
+                
+                tile = target_frame.image[i * height:(i + 1) * height, j * width:(j + 1) * width]
+                tiles.append(Frame(tile))
+                
+                #cv2.imwrite("frames/frame%d.jpg" % count, tile)
+
+                count += 1 
+
+        return tiles
+            
+
         
 
-    def CreateMozaic(self, dst_path):
+    def ProcessVideo(self, dst_path):
         self.dst_path = dst_path # path of the final result
 
         # in case you need it
@@ -43,7 +86,6 @@ class Mozavid:
 
         while success and count < limit:
             if count % 100 == 0:
-                # save frame as JPEG file
                 # cv2.imwrite("frames/frame%d.jpg" % count, frame)  
                 #print('still chewing...')                
                 pass
@@ -54,7 +96,7 @@ class Mozavid:
             success, image = self.vidcap.read()
             count += 1
 
-        self.CreateTiles(frames)
+        tiles = self.CreateTiles(frames)
         self.ExecuteHistogramComparison(frames)
     
     def ExecuteHistogramComparison(self, frames):
