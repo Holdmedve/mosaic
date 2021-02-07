@@ -1,4 +1,4 @@
-from process_vid import Mozavid
+from process_video import Mozavid
 
 # setup
 video_path = 'RICE_BALLS.mp4'
