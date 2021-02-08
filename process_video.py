@@ -77,9 +77,6 @@ class Mozavid:
                 
                 tile = target_frame.image[i * height:(i + 1) * height, j * width:(j + 1) * width]
                 tiles.append(Frame(tile))
-                
-                #cv2.imwrite("frames/frame%d.jpg" % count, tile)
-
                 count += 1 
 
         return tiles
@@ -105,13 +102,10 @@ class Mozavid:
         #print(fps)
         #print(frame_count)
 
+        print("\n\nstep 1 out of 3")
+        print("processing video...")
 
-        print("\n\nprocessing video...")
         while success:
-            if count % 1000 == 0:
-                percent = (count / frame_count) * 100
-                print(str(int(percent)) + "%")
-
             frame = Frame(image)
             frames.append(frame)
 
@@ -129,9 +123,12 @@ class Mozavid:
         """for each tile find the most fitting frame"""
 
         threshold = 0.5 # might not even need it
-        indeces = [] # holds the best fitting frame indeces
+        indeces = []  # holds the best fitting frame indeces
+        
+        print("\n\nstep 2 out of 3")
+        print("comparing histograms...")
 
-        for tile in tiles:            
+        for i, tile in enumerate(tiles):                  
             best_fit_idx = 0
             best_similarity = 0
 
@@ -160,10 +157,18 @@ class Mozavid:
         row = None
         new_row = True
         mozaik_empty = True
+
+        print("\n\nstep 3 out of 3")
+        print("\ncreating mozaik...")
+
         # create the mozaik row-by-row
         for count, idx in enumerate(indeces):
+            image = frames[idx].image
+            width = int(image.shape[1] / self.recursion_level)
+            height = int(image.shape[0] / self.recursion_level)
             
-            tile = frames[idx].image
+            dim = (width, height)
+            tile = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
 
             if new_row == True:
                 row = tile
@@ -172,7 +177,6 @@ class Mozavid:
                 row = np.concatenate((row, tile), axis=1)
 
             if count > 0 and (count + 1) % self.split_level == 0:
-                #print('beep')
                 if mozaik_empty == True:
                     mozaik = row
                     mozaik_empty = False
@@ -180,14 +184,10 @@ class Mozavid:
                     mozaik = np.concatenate((mozaik, row), axis=0)
                 new_row = True
 
-            #print("count: " + str(count))
-            #print(new_row)
-            #print("row: " + str(row.shape))
-            #print("mozaik: " + str(mozaik.shape))
         
         # save final product
         cv2.imwrite(self.dst_path + ".jpg", mozaik)
-                    
+        print("saved as " + self.dst_path + ".jpg")
         
 
     
