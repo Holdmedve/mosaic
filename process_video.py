@@ -10,6 +10,7 @@ class Frame:
         self.hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         self.hist = self.CalculateHistogram()
 
+
     def CalculateHistogram(self):
         # bins help reduce computation time
         # they split the range into the specified number of bins
@@ -28,6 +29,7 @@ class Frame:
         cv2.normalize(hist, hist, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
 
         return hist
+
         
     
 # A mozaic made from a video
@@ -63,21 +65,15 @@ class Mozavid:
 
         # this is how many times the edges of the target frame
         # are split into equal length sections
-        split_level = 2 ** self.recursion_level
+        self.split_level = 2 ** self.recursion_level
 
-        height = shape[0] // (split_level)
-        width = shape[1] // (split_level)
-        tile_resolution = (height, width)
-
-        #DEBUG
-        print(height)
-        print(width)
-        print(tile_resolution)
+        height = shape[0] // (self.split_level)
+        width = shape[1] // (self.split_level)
 
         tiles = []
         count = 0
-        for i in range(split_level):
-            for j in range(split_level):
+        for i in range(self.split_level):
+            for j in range(self.split_level):
                 
                 tile = target_frame.image[i * height:(i + 1) * height, j * width:(j + 1) * width]
                 tiles.append(Frame(tile))
@@ -94,8 +90,7 @@ class Mozavid:
     def ProcessVideo(self, dst_path):
         self.dst_path = dst_path # path of the final result
 
-        # in case you need it
-        #framespersecond= int(cap.get(cv2.CAP_PROP_FPS))
+        
 
         # lehet eleve olyan felbontásban érdemes olvasni, amekkora egy tile
         # lehet gyorsítana a dolgokon, bár kevesebb pixel alapján
@@ -103,13 +98,19 @@ class Mozavid:
         success, image = self.vidcap.read()
         count = 0
         frames = []
-        limit = 420 # to make things faster
+        limit = 420  # to make things faster
+        
+        fps = int(self.vidcap.get(cv2.CAP_PROP_FPS))
+        frame_count = int(self.vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+        #print(fps)
+        #print(frame_count)
 
-        while success and count < limit:
-            if count % 100 == 0:
-                # cv2.imwrite("frames/frame%d.jpg" % count, frame)  
-                #print('still chewing...')                
-                pass
+
+        print("\n\nprocessing video...")
+        while success:
+            if count % 1000 == 0:
+                percent = (count / frame_count) * 100
+                print(str(int(percent)) + "%")
 
             frame = Frame(image)
             frames.append(frame)
@@ -121,6 +122,8 @@ class Mozavid:
         tiles = self.CreateTiles(target_frame)
         
         self.CompareHistograms(frames, tiles)
+
+
     
     def CompareHistograms(self, frames, tiles):
         """for each tile find the most fitting frame"""
@@ -142,11 +145,50 @@ class Mozavid:
 
             indeces.append(best_fit_idx)
 
+        self.CreateMozaik(indeces, frames)
 
 
 
+    def CreateMozaik(self, indeces, frames):
+        """create the final output
+            indeces mark which frames to use """
+            
+        #test_image = np.concatenate((frames[indeces[0]].image, frames[indeces[1]].image), axis=1)
+        #cv2.imwrite("frames/test.jpg", test_image)
 
+        mozaik = None
+        row = None
+        new_row = True
+        mozaik_empty = True
+        # create the mozaik row-by-row
+        for count, idx in enumerate(indeces):
+            
+            tile = frames[idx].image
 
+            if new_row == True:
+                row = tile
+                new_row = False
+            else:
+                row = np.concatenate((row, tile), axis=1)
+
+            if count > 0 and (count + 1) % self.split_level == 0:
+                #print('beep')
+                if mozaik_empty == True:
+                    mozaik = row
+                    mozaik_empty = False
+                else:
+                    mozaik = np.concatenate((mozaik, row), axis=0)
+                new_row = True
+
+            #print("count: " + str(count))
+            #print(new_row)
+            #print("row: " + str(row.shape))
+            #print("mozaik: " + str(mozaik.shape))
+        
+        # save final product
+        cv2.imwrite(self.dst_path + ".jpg", mozaik)
+                    
+        
 
     
     def FramesAreDifferent(self, one_frame, other_frame):
