@@ -32,9 +32,9 @@ class Frame:
 
         
     
-# A mozaic made from a video
+# mozaic made from a video
 class Mozavid:
-    def __init__(self, vid_path, target_frame_idx, recursion_level):
+    def __init__(self, vid_path, target_frame_idx, recursion_level, histogram_threshold):
         
         # checks
         if not isinstance(recursion_level, int) or recursion_level <= 0:
@@ -51,6 +51,8 @@ class Mozavid:
         self.target_frame_idx = target_frame_idx
         # the target frame is split recursively this many times into quarters
         self.recursion_level = recursion_level
+        # threshold when filling the mozaik with tiles
+        self.threshold = histogram_threshold
 
         
 
@@ -60,15 +62,10 @@ class Mozavid:
             by one of the (downsized)frames. Which frame u ask?
             One whoose histogram is similar enough to the tile """
 
-        
-        shape = target_frame.image.shape
-
-        # this is how many times the edges of the target frame
-        # are split into equal length sections
-        self.split_level = 2 ** self.recursion_level
-
-        height = shape[0] // (self.split_level)
-        width = shape[1] // (self.split_level)
+        #height = self.tile_height
+        #width = self.tile_width
+        height = int(target_frame.image.shape[0] / self.split_level)
+        width = int(target_frame.image.shape[1] / self.split_level)
 
         tiles = []
         count = 0
@@ -77,7 +74,10 @@ class Mozavid:
                 
                 tile = target_frame.image[i * height:(i + 1) * height, j * width:(j + 1) * width]
                 tiles.append(Frame(tile))
-                count += 1 
+                count += 1
+                
+        for i, t in enumerate(tiles):
+            cv2.imwrite("tiles/" + str(i) + ".jpg", t.image)
 
         return tiles
             
@@ -87,30 +87,48 @@ class Mozavid:
     def ProcessVideo(self, dst_path):
         self.dst_path = dst_path # path of the final result
 
-        
-
         # lehet eleve olyan felbontásban érdemes olvasni, amekkora egy tile
         # lehet gyorsítana a dolgokon, bár kevesebb pixel alapján
         # számolnál histogram-ot
         success, image = self.vidcap.read()
-        count = 0
         frames = []
-        limit = 420  # to make things faster
         
-        fps = int(self.vidcap.get(cv2.CAP_PROP_FPS))
+        #fps = int(self.vidcap.get(cv2.CAP_PROP_FPS))
         frame_count = int(self.vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
-        #print(fps)
-        #print(frame_count)
 
         print("\n\nstep 1 out of 3")
         print("processing video...")
 
+        # this is how many times the edges of the target frame
+        # are split into equal length sections
+        self.split_level = 2 ** self.recursion_level
+
+        # tile dimensions; every frame that's not the target frame
+        # is downsized to tile dimensions 
+        self.tile_width = int(image.shape[1] / self.split_level)
+        self.tile_height = int(image.shape[0] / self.split_level)
+        dim = (self.tile_width, self.tile_height)
+
+        num = 0
+        count = 0
+
         while success:
+            # show progress
+            percent = int(count / frame_count * 100)
+            if percent // 10 > num // 10:
+                print(str(percent) + "%")
+                num = percent
+
+            if count != self.target_frame_idx:
+                image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+
             frame = Frame(image)
             frames.append(frame)
 
             success, image = self.vidcap.read()
             count += 1
+
+        print("100%")
 
         target_frame = frames[self.target_frame_idx]
         tiles = self.CreateTiles(target_frame)
@@ -120,27 +138,55 @@ class Mozavid:
 
     
     def CompareHistograms(self, frames, tiles):
-        """for each tile find the most fitting frame"""
+        """for each tile find a frame that's similar enough"""
 
-        threshold = 0.5 # might not even need it
-        indeces = []  # holds the best fitting frame indeces
+        threshold = 0.3
+        indeces = []
         
         print("\n\nstep 2 out of 3")
         print("comparing histograms...")
 
-        for i, tile in enumerate(tiles):                  
+
+        num = 0
+        listIdx = 0
+        for i, tile in enumerate(tiles):
+            # show progress
+            percent = int(i / len(tiles) * 100)
+            if percent // 10 > num // 10:
+                print(str(percent) + "%")
+                num = percent
+
             best_fit_idx = 0
             best_similarity = 0
 
-            for idx, frame in enumerate(frames):
-                similarity = cv2.compareHist(frame.hist, tile.hist, 0)
+            tries = 0
+            while tries < len(frames):
+                # reset to beginning
+                if listIdx == len(frames): listIdx = 0
+
+                # avoid placing target frame as a tile (dimensions won't fit)
+                if listIdx == self.target_frame_idx:
+                    listIdx += 1
+                    tries += 1
+                    continue
                 
-                # similarity > threshold
-                if similarity > best_similarity and idx not in indeces:
+                frame_hist = frames[listIdx].hist
+                similarity = cv2.compareHist(frame_hist, tile.hist, 0)
+                
+                if similarity > threshold:
+                    best_fit_idx = listIdx
+                    break
+
+                if similarity > best_similarity:
                     best_similarity = similarity
-                    best_fit_idx = idx
+                    best_fit_idx = listIdx
+
+                listIdx += 1
+                tries += 1
 
             indeces.append(best_fit_idx)
+
+        print("100%")
 
         self.CreateMozaik(indeces, frames)
 
@@ -149,9 +195,6 @@ class Mozavid:
     def CreateMozaik(self, indeces, frames):
         """create the final output
             indeces mark which frames to use """
-            
-        #test_image = np.concatenate((frames[indeces[0]].image, frames[indeces[1]].image), axis=1)
-        #cv2.imwrite("frames/test.jpg", test_image)
 
         mozaik = None
         row = None
@@ -161,14 +204,19 @@ class Mozavid:
         print("\n\nstep 3 out of 3")
         print("\ncreating mozaik...")
 
+        dim = (self.tile_width, self.tile_height)
+        num = 0
         # create the mozaik row-by-row
         for count, idx in enumerate(indeces):
-            image = frames[idx].image
-            width = int(image.shape[1] / self.recursion_level)
-            height = int(image.shape[0] / self.recursion_level)
-            
-            dim = (width, height)
-            tile = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+            # show progress
+            percent = int(count / len(indeces) * 100)
+            if percent // 10 > num // 10:
+                print(str(percent) + "%")
+                num = percent
+
+            #image = frames[idx].image
+            #tile = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+            tile = frames[idx].image
 
             if new_row == True:
                 row = tile
@@ -183,6 +231,8 @@ class Mozavid:
                 else:
                     mozaik = np.concatenate((mozaik, row), axis=0)
                 new_row = True
+
+        print("100%")
 
         
         # save final product
