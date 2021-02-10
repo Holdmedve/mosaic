@@ -14,14 +14,16 @@ class Frame:
     def __init__(self, image):
         self.image = image
         self.hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        self.hist = self.CalculateHistogram()
+        self.hists = self.CalculateHistograms()
 
 
-    def CalculateHistogram(self):
+    def CalculateHistograms(self):
+        # calculate the histogram of the 4 quarters
+
         # bins help reduce computation time
         # they split the range into the specified number of bins
-        h_bins = 16
-        s_bins = 32
+        h_bins = 16 # h: hue
+        s_bins = 32 # s: saturation
         histSize = [h_bins, s_bins]
 
         # hue varies from 0 to 179 (opencv specific), saturation from 0 to 255
@@ -31,10 +33,26 @@ class Frame:
         
         channels = [0, 1]
 
-        hist = cv2.calcHist([self.hsv], channels, None, histSize, ranges, accumulate=False)
-        cv2.normalize(hist, hist, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+        width = self.hsv.shape[1]
+        width_half = int(width / 2)
+        height = self.hsv.shape[0]
+        height_half = int(height / 2)
 
-        return hist
+        slices = []
+        # the 4 quarters
+        slices.append((slice(0, height_half), slice(0, width_half)))
+        slices.append((slice(0, height_half), slice(width_half, width)))
+        slices.append((slice(height_half, height), slice(0, width_half)))
+        slices.append((slice(height_half, height), slice(width_half, width)))
+        
+        hists = []
+        for i, s in enumerate(slices):
+            hist = cv2.calcHist([self.hsv[s]], channels, None, histSize, ranges, accumulate=False)
+            cv2.normalize(hist, hist, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+            hists.append(hist)
+            #cv2.imwrite("asd" + str(i) + ".jpg", self.hsv[s])
+
+        return hists
 
         
     
@@ -49,9 +67,10 @@ class Mozavid:
 
         # target frame nem létezik
 
-        # útvonalon nem létezik mp4
-
         self.vidcap = cv2.VideoCapture(vid_path)
+        if self.vidcap is None or not self.vidcap.isOpened():
+            print('Unable to open video source: ', vid_path)
+            exit(1)
 
         # the frame to be recreated
         self.target_frame_idx = target_frame_idx
@@ -83,7 +102,7 @@ class Mozavid:
                 count += 1
                 
         for i, t in enumerate(tiles):
-            cv2.imwrite("tiles/" + str(i) + ".jpg", t.image)
+            cv2.imwrite("/tiles/" + str(i) + ".jpg", t.image)
 
         return tiles
             
@@ -117,6 +136,7 @@ class Mozavid:
 
         num = 0
         count = 0
+        limit = 2
 
         while success:
             # show progress
@@ -146,7 +166,6 @@ class Mozavid:
     def CompareHistograms(self, frames, tiles):
         """for each tile find a frame that's similar enough"""
 
-        threshold = 0.3
         indeces = []
         
         print("\n\nstep 2 out of 3")
@@ -176,10 +195,10 @@ class Mozavid:
                     tries += 1
                     continue
                 
-                frame_hist = frames[listIdx].hist
-                similarity = cv2.compareHist(frame_hist, tile.hist, 0)
-                
-                if similarity > threshold:
+                similarity = self.HistCompAvg(frames[listIdx], tile)
+
+                # good enough, stop searching
+                if similarity > self.threshold:
                     best_fit_idx = listIdx
                     break
 
@@ -190,11 +209,25 @@ class Mozavid:
                 listIdx += 1
                 tries += 1
 
+            if tries == len(frames):
+                print("went through whole vide")
             indeces.append(best_fit_idx)
 
         print("100%")
 
         self.CreateMozaik(indeces, frames)
+
+    def HistCompAvg(self, frame, tile):
+        """compare the histograms of the 4 quarters
+            and return the average """
+
+        sim_sum = 0
+        for i in range(4):
+            sim = cv2.compareHist(frame.hists[i], tile.hists[i], 0)
+            sim_sum += sim
+
+        return sim_sum / 4
+
 
 
 
