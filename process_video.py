@@ -7,7 +7,7 @@ import cv2
 # position of the colors, as a single histogram gives only a distribution
 
 # to seleect a frame for a tile, sum the 4(or more) histogram comparison outputs (or try the average)
-# if that sum is above a threshold, it's good enough 
+# if that sum is above a threshold, it's good enough
 
 class Frame:
 
@@ -30,36 +30,43 @@ class Frame:
         h_ranges = [0, 180]
         s_ranges = [0, 256]
         ranges = h_ranges + s_ranges  # concat lists
-        
+
         channels = [0, 1]
 
-        width = self.hsv.shape[1]
-        width_half = int(width / 2)
-        height = self.hsv.shape[0]
-        height_half = int(height / 2)
+        num = 2 ** Mozavid.histogram_recursion
+        width = int(self.hsv.shape[1] / num)
+        height = int(self.hsv.shape[0] / num)
 
         slices = []
-        # the 4 quarters
+        
+        """# the 4 quarters
         slices.append((slice(0, height_half), slice(0, width_half)))
         slices.append((slice(0, height_half), slice(width_half, width)))
         slices.append((slice(height_half, height), slice(0, width_half)))
-        slices.append((slice(height_half, height), slice(width_half, width)))
-        
+        slices.append((slice(height_half, height), slice(width_half, width)))"""
+
         hists = []
-        for i, s in enumerate(slices):
-            hist = cv2.calcHist([self.hsv[s]], channels, None, histSize, ranges, accumulate=False)
-            cv2.normalize(hist, hist, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-            hists.append(hist)
-            #cv2.imwrite("asd" + str(i) + ".jpg", self.hsv[s])
+        count = 0
+        for i in range(num):
+            for j in range(num):
+                s = (slice(i * height, (i + 1) * height), slice(j * width, (j + 1) * width))
+                hist = cv2.calcHist([self.hsv[s]], channels, None, histSize, ranges, accumulate=False)
+                
+                cv2.normalize(hist, hist, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+                hists.append(hist)
+                
+                #cv2.imwrite("test/asd" + str(count) + ".jpg", self.hsv[s])
+                count += 1
+
 
         return hists
 
-        
-    
+
+
 # mozaic made from a video
 class Mozavid:
     def __init__(self, vid_path, target_frame_idx, recursion_level, histogram_threshold):
-        
+
         # checks
         if not isinstance(recursion_level, int) or recursion_level <= 0:
             print('recursion level has to be an integer above 0')
@@ -74,12 +81,14 @@ class Mozavid:
 
         # the frame to be recreated
         self.target_frame_idx = target_frame_idx
+
         # the target frame is split recursively this many times into quarters
         self.recursion_level = recursion_level
+
         # threshold when filling the mozaik with tiles
         self.threshold = histogram_threshold
 
-        
+
 
     def CreateTiles(self, target_frame):
         """Quarter the target frame as many times as specified be the recursion level
@@ -96,28 +105,27 @@ class Mozavid:
         count = 0
         for i in range(self.split_level):
             for j in range(self.split_level):
-                
+
                 tile = target_frame.image[i * height:(i + 1) * height, j * width:(j + 1) * width]
                 tiles.append(Frame(tile))
                 count += 1
-                
+
         for i, t in enumerate(tiles):
             cv2.imwrite("/tiles/" + str(i) + ".jpg", t.image)
 
         return tiles
-            
 
-        
 
-    def ProcessVideo(self, dst_path):
-        self.dst_path = dst_path # path of the final result
 
-        # lehet eleve olyan felbontásban érdemes olvasni, amekkora egy tile
-        # lehet gyorsítana a dolgokon, bár kevesebb pixel alapján
-        # számolnál histogram-ot
+
+    def ProcessVideo(self, dst_path, histogram_recursion):
+        self.dst_path = dst_path  # path of the final result
+        # how many times to divide a tile and calc its histogram
+        Mozavid.histogram_recursion = histogram_recursion
+
         success, image = self.vidcap.read()
         frames = []
-        
+
         #fps = int(self.vidcap.get(cv2.CAP_PROP_FPS))
         frame_count = int(self.vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -129,14 +137,14 @@ class Mozavid:
         self.split_level = 2 ** self.recursion_level
 
         # tile dimensions; every frame that's not the target frame
-        # is downsized to tile dimensions 
+        # is downsized to tile dimensions
         self.tile_width = int(image.shape[1] / self.split_level)
         self.tile_height = int(image.shape[0] / self.split_level)
         dim = (self.tile_width, self.tile_height)
 
         num = 0
         count = 0
-        limit = 2
+        limit = 1000
 
         while success:
             # show progress
@@ -158,16 +166,16 @@ class Mozavid:
 
         target_frame = frames[self.target_frame_idx]
         tiles = self.CreateTiles(target_frame)
-        
+
         self.CompareHistograms(frames, tiles)
 
 
-    
+
     def CompareHistograms(self, frames, tiles):
         """for each tile find a frame that's similar enough"""
 
         indeces = []
-        
+
         print("\n\nstep 2 out of 3")
         print("comparing histograms...")
 
@@ -194,7 +202,7 @@ class Mozavid:
                     listIdx += 1
                     tries += 1
                     continue
-                
+
                 similarity = self.HistCompAvg(frames[listIdx], tile)
 
                 # good enough, stop searching
@@ -210,7 +218,9 @@ class Mozavid:
                 tries += 1
 
             if tries == len(frames):
-                print("went through whole vide")
+                pass
+                #print("went through whole vide")
+
             indeces.append(best_fit_idx)
 
         print("100%")
@@ -221,12 +231,13 @@ class Mozavid:
         """compare the histograms of the 4 quarters
             and return the average """
 
+        hist_count = len(frame.hists)
         sim_sum = 0
-        for i in range(4):
+        for i in range(hist_count):
             sim = cv2.compareHist(frame.hists[i], tile.hists[i], 0)
             sim_sum += sim
 
-        return sim_sum / 4
+        return sim_sum / hist_count
 
 
 
@@ -273,13 +284,13 @@ class Mozavid:
 
         print("100%")
 
-        
+
         # save final product
         cv2.imwrite(self.dst_path + ".jpg", mozaik)
         print("saved as " + self.dst_path + ".jpg")
-        
 
-    
+
+
     def FramesAreDifferent(self, one_frame, other_frame):
         #one_frame.shape == other_frame.shape and not(np.bitwise_xor(one_frame,other_frame).any())
         # here i assume that the two frames have the same shape
