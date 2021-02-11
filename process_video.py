@@ -2,12 +2,7 @@ import numpy as np
 import cv2
 
 # https://docs.opencv.org/4.5.1/d8/dc8/tutorial_histogram_comparison.html
-# calculate the histogram not for a tile, but the 4 quarters of the tile or more
-# my hope is that this way the program is somewhat "aware" about the
-# position of the colors, as a single histogram gives only a distribution
 
-# to seleect a frame for a tile, sum the 4(or more) histogram comparison outputs (or try the average)
-# if that sum is above a threshold, it's good enough
 
 class Frame:
 
@@ -38,12 +33,6 @@ class Frame:
         height = int(self.hsv.shape[0] / num)
 
         slices = []
-        
-        """# the 4 quarters
-        slices.append((slice(0, height_half), slice(0, width_half)))
-        slices.append((slice(0, height_half), slice(width_half, width)))
-        slices.append((slice(height_half, height), slice(0, width_half)))
-        slices.append((slice(height_half, height), slice(width_half, width)))"""
 
         hists = []
         count = 0
