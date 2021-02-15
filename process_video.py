@@ -95,6 +95,7 @@ class Mozavid:
         for i in range(self.split_level):
             for j in range(self.split_level):
 
+                # SLICE
                 tile = target_frame.image[i * height:(i + 1) * height, j * width:(j + 1) * width]
                 tiles.append(Frame(tile))
                 count += 1
@@ -108,6 +109,8 @@ class Mozavid:
 
 
     def ProcessVideo(self, dst_path, histogram_recursion):
+        """read a frame every second"""
+
         self.dst_path = dst_path  # path of the final result
         # how many times to divide a tile and calc its histogram
         Mozavid.histogram_recursion = histogram_recursion
@@ -115,7 +118,7 @@ class Mozavid:
         success, image = self.vidcap.read()
         frames = []
 
-        #fps = int(self.vidcap.get(cv2.CAP_PROP_FPS))
+        fps = int(self.vidcap.get(cv2.CAP_PROP_FPS))
         frame_count = int(self.vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         print("\n\nstep 1 out of 3")
@@ -125,35 +128,53 @@ class Mozavid:
         # are split into equal length sections
         self.split_level = 2 ** self.recursion_level
 
-        # tile dimensions; every frame that's not the target frame
+        # tile dimensions. every frame that's not the target frame
         # is downsized to tile dimensions
         self.tile_width = int(image.shape[1] / self.split_level)
         self.tile_height = int(image.shape[0] / self.split_level)
         dim = (self.tile_width, self.tile_height)
 
+        # to follow progress
         num = 0
         count = 0
+
         limit = 1000
 
-        while success:
+        # the frame to read next
+        cursor = 0
+
+        while success and cursor < frame_count:
             # show progress
             percent = int(count / frame_count * 100)
             if percent // 10 > num // 10:
                 print(str(percent) + "%")
                 num = percent
-
-            if count != self.target_frame_idx:
-                image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
-
+            
+            # downsize to tile size
+            image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
             frame = Frame(image)
             frames.append(frame)
 
+            print(type(cursor))
+            print(cursor)
+
+            # cv2.imwrite('test/' + str(cursor) + ".jpg", frame.image)
+
+            # get next frame
+            self.vidcap.set(cv2.CAP_PROP_POS_FRAMES, cursor)
             success, image = self.vidcap.read()
+            # print(success)
+            
             count += 1
+            cursor += fps
 
         print("100%")
 
-        target_frame = frames[self.target_frame_idx]
+        # get target frame
+        self.vidcap.set(cv2.CAP_PROP_POS_FRAMES, self.target_frame_idx)
+        success, image = self.vidcap.read()
+        target_frame = Frame(image)
+
         tiles = self.CreateTiles(target_frame)
 
         self.CompareHistograms(frames, tiles)
@@ -188,14 +209,15 @@ class Mozavid:
 
                 # avoid placing target frame as a tile (dimensions won't fit)
                 if listIdx == self.target_frame_idx:
+                    print("beep boop this shouldn't pprint")
                     listIdx += 1
                     tries += 1
                     continue
 
                 similarity = self.HistCompAvg(frames[listIdx], tile)
 
-                # good enough, stop searching
-                if similarity > self.threshold:
+                
+                if similarity > self.threshold: # good enough, stop searching
                     best_fit_idx = listIdx
                     break
 
@@ -207,8 +229,7 @@ class Mozavid:
                 tries += 1
 
             if tries == len(frames):
-                pass
-                #print("went through whole vide")
+                print("went through whole vide")
 
             indeces.append(best_fit_idx)
 
@@ -217,8 +238,7 @@ class Mozavid:
         self.CreateMozaik(indeces, frames)
 
     def HistCompAvg(self, frame, tile):
-        """compare the histograms of the 4 quarters
-            and return the average """
+        """compare histograms of the tile and the frame"""
 
         hist_count = len(frame.hists)
         sim_sum = 0
