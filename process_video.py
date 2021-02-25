@@ -170,6 +170,7 @@ class Mozavid:
 
         tiles = self.CreateTiles(target_frame)
         self.CompareHistograms(frames, tiles)
+        
 
 
 
