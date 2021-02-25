@@ -17,8 +17,8 @@ class Frame:
 
         # bins help reduce computation time
         # they split the range into the specified number of bins
-        h_bins = 16 # h: hue
-        s_bins = 32 # s: saturation
+        h_bins = 30 # h: hue
+        s_bins = 64 # s: saturation
         histSize = [h_bins, s_bins]
 
         # hue varies from 0 to 179 (opencv specific), saturation from 0 to 255
@@ -54,7 +54,7 @@ class Frame:
 
 # mozaic made from a video
 class Mozavid:
-    def __init__(self, vid_path, target_frame_idx, recursion_level, histogram_threshold):
+    def __init__(self, vid_path, recursion_level, histogram_threshold):
 
         # checks
         if not isinstance(recursion_level, int) or recursion_level <= 0:
@@ -67,9 +67,6 @@ class Mozavid:
         if self.vidcap is None or not self.vidcap.isOpened():
             print('Unable to open video source: ', vid_path)
             exit(1)
-
-        # the frame to be recreated
-        self.target_frame_idx = target_frame_idx
 
         # the target frame is split recursively this many times into quarters
         self.recursion_level = recursion_level
@@ -108,12 +105,15 @@ class Mozavid:
 
 
 
-    def ProcessVideo(self, dst_path, histogram_recursion):
+    def ProcessVideo(self, dst_path, histogram_recursion, target_image):
         """read a frame every second"""
 
         self.dst_path = dst_path  # path of the final result
         # how many times to divide a tile and calc its histogram
         Mozavid.histogram_recursion = histogram_recursion
+
+        image = cv2.imread(target_image)
+        target_frame = Frame(image)
 
         success, image = self.vidcap.read()
         frames = []
@@ -123,6 +123,7 @@ class Mozavid:
 
         print("\n\nstep 1 out of 3")
         print("processing video...")
+
 
         # this is how many times the edges of the target frame
         # are split into equal length sections
@@ -155,9 +156,6 @@ class Mozavid:
             frame = Frame(image)
             frames.append(frame)
 
-            print(type(cursor))
-            print(cursor)
-
             # cv2.imwrite('test/' + str(cursor) + ".jpg", frame.image)
 
             # get next frame
@@ -170,13 +168,7 @@ class Mozavid:
 
         print("100%")
 
-        # get target frame
-        self.vidcap.set(cv2.CAP_PROP_POS_FRAMES, self.target_frame_idx)
-        success, image = self.vidcap.read()
-        target_frame = Frame(image)
-
         tiles = self.CreateTiles(target_frame)
-
         self.CompareHistograms(frames, tiles)
 
 
@@ -207,13 +199,6 @@ class Mozavid:
                 # reset to beginning
                 if listIdx == len(frames): listIdx = 0
 
-                # avoid placing target frame as a tile (dimensions won't fit)
-                if listIdx == self.target_frame_idx:
-                    print("beep boop this shouldn't pprint")
-                    listIdx += 1
-                    tries += 1
-                    continue
-
                 similarity = self.HistCompAvg(frames[listIdx], tile)
 
                 
@@ -227,9 +212,6 @@ class Mozavid:
 
                 listIdx += 1
                 tries += 1
-
-            if tries == len(frames):
-                print("went through whole vide")
 
             indeces.append(best_fit_idx)
 
