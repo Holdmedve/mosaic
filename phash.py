@@ -7,18 +7,17 @@ def pHash(image, hashSize=16):
     # a diff image with dimensions hashSize*hashSize 
     # where the diff comes from adjacent columns
     resized = cv2.resize(image, (hashSize + 1, hashSize))
-    resized = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
+    #resized = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
 
-    #hash_sum = 0
-    #for i in range(3):
-    #    channel = resized[:, :, i]
-    #    diff = channel[:, 1:] > channel[:, :-1]
-    #    s = sum([2 ** i for (i, v) in enumerate(diff.flatten()) if v])
-    #    hash_sum += s
-    diff = resized[:, 1:] > resized[:, :-1]
+    hash_list = []
+    for i in range(3):
+        channel = resized[:, :, i]
+        diff = channel[:, 1:] > channel[:, :-1]
+        s = sum([2 ** i for (i, v) in enumerate(diff.flatten()) if v])
+        hash_list.append(s)
 
     # convert boolen image to hash
-    return sum([2 ** i for (i, v) in enumerate(diff.flatten()) if v])
+    return hash_list
 
 
 class Frame:
@@ -77,21 +76,34 @@ def calcTileHashes(target_image, split_level):
             
     return tile_hashes
 
+def avgDiff(target_hash, frame):
+    diff_1 = abs(frame.phash[0] - target_hash[0])
+    diff_2 = abs(frame.phash[1] - target_hash[1])
+    diff_3 = abs(frame.phash[2] - target_hash[2])
+
+    return (diff_1 + diff_2 + diff_3) / 3
+
+
 def findBestFit(frames, tile_hashes):
     """for each tile find the best fitting frame based on 
         hash difference"""
+    
     best_fit_indeces = []
     print('\nlen(tile_hashes): ' + str(len(tile_hashes)))
 
     print('finding best fits for each tile...')
+    # for each tile find the frame with closest hash
     for target_hash in tile_hashes:
         
-        best_idx = 0        
+        best_idx = 0
+        # assume first is best so we can compare in next loop
+        best_avg_diff = avgDiff(target_hash, frames[0])
+        
         for idx, f in enumerate(frames):
-            
-            diff = abs(f.phash - target_hash)            
-            if diff < abs(frames[best_idx].phash - target_hash):
+            cur_avg_diff = avgDiff(target_hash, f)
+            if cur_avg_diff < best_avg_diff:
                 best_idx = idx
+                best_avg_diff = cur_avg_diff
 
         best_fit_indeces.append(best_idx)
 
@@ -150,7 +162,7 @@ def createMozaik(video_path, target_image_path, recursion_level):
 
 target_image = 'images/ey_boss.jpg'
 video = 'videos/best_of.mp4'
-recursion_level = 5
+recursion_level = 6
 
 createMozaik(video, target_image, recursion_level)
 
