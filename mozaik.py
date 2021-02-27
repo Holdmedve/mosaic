@@ -1,5 +1,7 @@
 import numpy as np
 import cv2
+import argparse
+import os
 
 class Frame:
     def __init__(self, image, color_mean):
@@ -114,8 +116,20 @@ def suture(frames, indeces, split_level):
     return mozaik
 
 
+def validateArgs(video_path, target_image_path):
+    
+    if not os.path.exists(video_path):
+        print('video path is invalid')
+        exit(1)
+
+    if not os.path.exists(target_image_path):
+        print('target image path is invalid')
+        exit(1)
+
 def createMozaik(video_path, target_image_path, recursion_level):
     
+    validateArgs(video_path, target_image_path)
+
     vidcap = cv2.VideoCapture(video_path)
     if vidcap is None or not vidcap.isOpened():
         print('Unable to open video source: ', video_path)
@@ -144,11 +158,22 @@ def createMozaik(video_path, target_image_path, recursion_level):
     print('mozaik saved as ', path)
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument('target_image', type=str, help='the mozaic will be made from this image')
+parser.add_argument('video', type=str, help='video where the frames will be used to create the mozaic tiles')
 
-target_image = 'images/rice_fields.jpg'
-video = 'videos/compilation.mp4'
-recursion_level = 6
-tile_scale = 4
+parser.add_argument('-r', '--recursion', type=int, default=6, 
+    help='specifies how many times the target image is split into quarters (default:6)')
+parser.add_argument('-s', '--scale', type=int, default=4,
+    help='each tile is scaled by this number (default:4)')
+
+args = parser.parse_args()
+
+
+target_image = args.target_image
+video = args.video
+recursion_level = args.recursion
+tile_scale = args.scale
 
 
 createMozaik(video, target_image, recursion_level)
