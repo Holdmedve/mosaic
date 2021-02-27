@@ -125,8 +125,8 @@ def createMozaik(video_path, target_image_path, recursion_level):
     split_level = 2 ** recursion_level
 
     # the target image is split into tiles based on the recursion level
-    tile_width = int(target_image.shape[1] / split_level)
-    tile_height = int(target_image.shape[0] / split_level)
+    tile_width = int(target_image.shape[1] / split_level *tile_scale)
+    tile_height = int(target_image.shape[0] / split_level *tile_scale)
 
     tile_dim = (tile_width, tile_height)
 
@@ -145,8 +145,10 @@ def createMozaik(video_path, target_image_path, recursion_level):
 
 
 
-target_image = 'images/vsauce.jpg'
-video = 'videos/down.mp4'
+target_image = 'images/rice_fields.jpg'
+video = 'videos/compilation.mp4'
 recursion_level = 6
+tile_scale = 4
+
 
 createMozaik(video, target_image, recursion_level)
