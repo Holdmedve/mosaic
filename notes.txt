@@ -1,9 +1,0 @@
-elkerülni, hogy a szomszédos tile-ok ne legyenek túl hasonlóak
-- pl bal-felső sarokból elindulva összehasonlítani minden tile-t a tőle
-	jobbra és tőle lefele elhelyezkedővel
-	ha túl hasonló (a histogram comparison szerint) akkor keresni kell egy
-	új tile-t (ha van ilyen) és kicserélni
-	ez esetben két feltételnek kell teljesülnie
-
-	1. a szomszédos hasonlóság legyen kisebb, mint az előre beállíott érték
-	2. a tile legyen kielégítően hasonló a target_frame-en kijelölt tilehoz
