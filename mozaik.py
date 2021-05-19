@@ -78,7 +78,7 @@ def findBestFit(frames, tile_color_means):
     
     best_fits = []
 
-    print('looking for best fits for each tile...')
+    print('looking for best fit for each tile...')
     for t_mean in tile_color_means:
         best_idx = 0
         closest = distance(t_mean, frames[0].color_mean)

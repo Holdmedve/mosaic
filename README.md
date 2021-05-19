@@ -12,3 +12,6 @@ python mozaik.py image.jpg video.mp4
 ```
 
 The repo contains an example for final result as 'my_mozaik.jpg'
+
+## example outcome
+![gandalf_mozaik](gandalf_mozaik.jpg)
