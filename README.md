@@ -2,6 +2,9 @@
 
 Goal: create a photo mosaic using frames taken from a video
 
+## example output
+![gandalf_mozaik](gandalf_mozaik.jpg)
+
 ## setup
 - python version used: 3.8.5
 - pip3 install -r requirements.txt
@@ -11,7 +14,5 @@ Goal: create a photo mosaic using frames taken from a video
 python mozaik.py image.jpg video.mp4
 ```
 
-The repo contains an example for final result as 'my_mozaik.jpg'
 
-## example outcome
-![gandalf_mozaik](gandalf_mozaik.jpg)
+
