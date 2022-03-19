@@ -12,12 +12,15 @@
 # below:
 .git
 .gitignore
+.github
 
 # Python pycache:
 __pycache__/
 # Ignored by the build system
 /setup.cfg
 
-gandalf_mozaik.jpg
-my_mozaik.jpg
+example_output
+tests
+requirements.txt
+
 README.md
