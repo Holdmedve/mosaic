@@ -1,0 +1,25 @@
+name: GitHub Actions
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Install python
+        uses:  actions/setup-python@v3
+        with: 
+          python-version: '3.9'
+      - name: Install dependencies
+        uses: py-actions/py-dependency-install@v3
+      - name: Run tests
+        run: python -m pytest
+  
+  dummy-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run deploy
+        run: echo 'placeholder for deploy command'

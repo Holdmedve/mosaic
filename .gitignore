@@ -1,10 +1,16 @@
 .vscode
 .idea
+
 frames
+images
+videos
+env
+mosavid
+
 *.pyc
 *.jpg
 *.mp4
-images
-videos
+
+
 
 !my_mozaik.jpg
