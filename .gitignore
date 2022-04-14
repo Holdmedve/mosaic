@@ -10,10 +10,8 @@ videos
 env
 mosavid
 
-*.pyc
-*.jpg
-*.mp4
+*.json
 
-
-
-!my_mozaik.jpg
+./*.pyc
+./*.jpg
+./*.mp4

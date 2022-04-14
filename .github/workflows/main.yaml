@@ -15,8 +15,11 @@ jobs:
           python-version: '3.9'
       - name: Install dependencies
         uses: py-actions/py-dependency-install@v3
+      - name: Run static type check
+        run: mypy mozaik.py
       - name: Run tests
         run: python -m pytest
+      
   
   deploy:
     needs: test
