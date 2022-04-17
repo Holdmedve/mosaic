@@ -28,6 +28,15 @@ class Data:
     source_video: str
 
 
+def mean_color_euclidian_distance(img_a: ndarray, img_b: ndarray) -> float:
+    mean_a = np.mean(img_a, axis=(0, 1))
+    mean_b = np.mean(img_b, axis=(0, 1))
+
+    dst = np.sqrt(((mean_a - mean_b) ** 2).sum(axis=0))
+
+    return dst
+
+
 def get_frames_from_video(vid_path: str) -> List[ndarray]:
     if not os.path.exists(vid_path):
         raise FileNotFoundError

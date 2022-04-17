@@ -1,15 +1,36 @@
 import pytest
+import cv2
 import numpy as np
 
 from project.mosavid import (
     get_frames_from_video,
     split_image_into_tiles,
     get_even_samples,
+    mean_color_euclidian_distance,
     InvalidSplitLevel,
 )
 
 TEST_MP4_PATH = "data/test_video.mp4"
 TEST_JPG_PATH = "data/pic1.jpg"
+
+
+class TestMeanColorEuclidianDistance:
+    def test__when_called_with_same_image__returns_1(self):
+        img = cv2.imread(TEST_JPG_PATH)
+
+        dst = mean_color_euclidian_distance(img, img)
+
+        assert dst == 0.0
+
+    def test__when_called_with_black_and_white_pixels__returns_body_diagonal_of_cube_with_256_long_edges(
+        self,
+    ):
+        black = np.array([[[0, 0, 0]]])
+        white = np.array([[[256, 256, 256]]])
+
+        dst = mean_color_euclidian_distance(black, white)
+
+        assert dst == 256 * np.sqrt(3)
 
 
 class TestGetFramesFromVideo:
@@ -63,11 +84,3 @@ class TestSplitInteger:
         splits = get_even_samples(to_split, split_degree)
 
         assert splits == expected_splits
-
-
-# @pytest.mark.parametrize("function", [get_frames_from_video, split_image_into_tiles])
-# def test__when_function_called_with_path_not_pointing_to_file__raises_exception(
-#     function,
-# ):
-#     with pytest.raises(FileNotFoundError):
-#         function()
