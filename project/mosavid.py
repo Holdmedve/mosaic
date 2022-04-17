@@ -12,10 +12,6 @@ class InvalidSplitLevel(Exception):
     pass
 
 
-def comparison_method(imgA, imgB) -> float:
-    pass
-
-
 @dataclass
 class Config:
     split_level: int
@@ -86,6 +82,24 @@ def split_image_into_tiles(img_path: str, split_level: int) -> list[list[ndarray
         tiles.append(row)
 
     return tiles
+
+
+def stitch_tiles(tiles: list[list[ndarray]]) -> ndarray:
+    result: ndarray
+
+    for x in range(len(tiles)):
+        row: ndarray
+        for y in range(len(tiles[0])):
+            if y == 0:
+                row = tiles[x][y]
+            else:
+                row = np.concatenate((row, tiles[x][y]), axis=0)
+        if x == 0:
+            result = row
+        else:
+            result = np.concatenate((result, row), axis=1)
+
+    return result
 
 
 # def create_mosaic(data: Data, config: Config) -> ndarray:

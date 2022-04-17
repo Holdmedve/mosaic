@@ -7,11 +7,30 @@ from project.mosavid import (
     split_image_into_tiles,
     get_even_samples,
     mean_color_euclidian_distance,
+    stitch_tiles,
     InvalidSplitLevel,
 )
 
 TEST_MP4_PATH = "data/test_video.mp4"
 TEST_JPG_PATH = "data/pic1.jpg"
+
+BLACK_PIXEL = [0, 0, 0]
+WHITE_PIXEL = [256, 256, 256]
+
+
+class TestStitchTiles:
+    def test__when_called_with_4_pixels_as_tiles__returns_them_as_1_array(self):
+        tiles = [
+            [np.array([[[BLACK_PIXEL]]]), np.array([[[WHITE_PIXEL]]])],
+            [np.array([[[WHITE_PIXEL]]]), np.array([[[BLACK_PIXEL]]])],
+        ]
+        expected_black_image = np.array(
+            [[[BLACK_PIXEL], [WHITE_PIXEL]], [[WHITE_PIXEL], [BLACK_PIXEL]]]
+        )
+
+        image = stitch_tiles(tiles)
+
+        assert (image == expected_black_image).all()
 
 
 class TestMeanColorEuclidianDistance:
@@ -25,8 +44,8 @@ class TestMeanColorEuclidianDistance:
     def test__when_called_with_black_and_white_pixels__returns_body_diagonal_of_cube_with_256_long_edges(
         self,
     ):
-        black = np.array([[[0, 0, 0]]])
-        white = np.array([[[256, 256, 256]]])
+        black = np.array([[BLACK_PIXEL]])
+        white = np.array([[WHITE_PIXEL]])
 
         dst = mean_color_euclidian_distance(black, white)
 
@@ -63,11 +82,6 @@ class TestSplitImageIntoTiles:
         assert len(tiles) == expected_tile_dimensions[0]
         assert len(tiles[0]) == expected_tile_dimensions[1]
         assert len({len(row) for row in tiles}) == 1
-
-    def test__when_called__returned_tiles_make_up_original_image(self):
-        tiles = split_image_into_tiles(TEST_JPG_PATH, 2)
-
-        assert 1 == 0
 
 
 class TestSplitInteger:
