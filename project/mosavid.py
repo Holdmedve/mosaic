@@ -1,9 +1,11 @@
-import cv2
+import cv2  # type: ignore
 import os
+
+import numpy as np
 
 from dataclasses import dataclass
 from numpy import ndarray
-from typing import Callable, List
+from typing import Callable, List, Tuple
 
 
 class InvalidSplitLevel(Exception):
@@ -45,11 +47,11 @@ def get_frames_from_video(vid_path: str) -> List[ndarray]:
     return frames
 
 
-# splits = np.linspace(0, 1452, 8)
-# list(map(lambda x: int(x), splits))
+def get_even_samples(to_sample: int, n: int) -> tuple[int, ...]:
+    return tuple(map(lambda x: int(x), np.linspace(0, to_sample, n)))
 
 
-def split_image_into_tiles(img_path: str, split_level: int) -> List[List[ndarray]]:
+def split_image_into_tiles(img_path: str, split_level: int) -> list[list[ndarray]]:
     if split_level < 1:
         raise InvalidSplitLevel("split level must be at least 1")
 
@@ -58,11 +60,23 @@ def split_image_into_tiles(img_path: str, split_level: int) -> List[List[ndarray
 
     img = cv2.imread(img_path)
 
-    tile_height = int(img.shape[0] / 2**split_level)
-    tile_width = int(img.shape[2] / 2**split_level)
-    horizontal_splits = split_integer()
+    x_splits = get_even_samples(img.shape[0], 2**split_level + 1)
+    y_splits = get_even_samples(img.shape[1], 2**split_level + 1)
 
-    tiles: List[List[ndarray]]
+    tiles: list[list[ndarray]] = []
+
+    for x in range(len(y_splits) - 1):
+        row = []
+        for y in range(len(x_splits) - 1):
+            s = (
+                slice(x_splits[x], x_splits[x + 1]),
+                slice(y_splits[y], y_splits[y + 1]),
+            )
+            tile = img[s]
+            row.append(tile)
+        tiles.append(row)
+
+    return tiles
 
 
 # def create_mosaic(data: Data, config: Config) -> ndarray:

@@ -1,8 +1,10 @@
 import pytest
+import numpy as np
 
 from project.mosavid import (
     get_frames_from_video,
     split_image_into_tiles,
+    get_even_samples,
     InvalidSplitLevel,
 )
 
@@ -37,10 +39,30 @@ class TestSplitImageIntoTiles:
     ):
         tiles = split_image_into_tiles(TEST_JPG_PATH, split_level)
 
-        assert tiles.shape == expected_tile_dimensions
+        assert len(tiles) == expected_tile_dimensions[0]
+        assert len(tiles[0]) == expected_tile_dimensions[1]
+        assert len({len(row) for row in tiles}) == 1
 
     def test__when_called__returned_tiles_make_up_original_image(self):
+        tiles = split_image_into_tiles(TEST_JPG_PATH, 2)
+
         assert 1 == 0
+
+
+class TestSplitInteger:
+    @pytest.mark.parametrize(
+        "to_split, split_degree, expected_splits",
+        [
+            (300, 4, (0, 100, 200, 300)),
+            (1452, 8, (0, 207, 414, 622, 829, 1037, 1244, 1452)),
+        ],
+    )
+    def test__when_called__returns_expected_splits(
+        self, to_split, split_degree, expected_splits
+    ):
+        splits = get_even_samples(to_split, split_degree)
+
+        assert splits == expected_splits
 
 
 # @pytest.mark.parametrize("function", [get_frames_from_video, split_image_into_tiles])
