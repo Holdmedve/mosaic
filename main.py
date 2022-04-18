@@ -11,7 +11,7 @@ app = Flask(
 app.config["UPLOAD_EXTENSIONS"] = [".mp4", ".jpg", ".png", ".jpeg"]
 
 
-def _file_is_valid(file):
+def _file_is_valid(file: str) -> bool:
     filename = secure_filename(file)
     if filename == "":
         return False
