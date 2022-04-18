@@ -65,17 +65,17 @@ def split_image_into_tiles(img_path: str, split_level: int) -> list[list[ndarray
 
     img = cv2.imread(img_path)
 
-    x_splits = get_even_samples(img.shape[0], 2**split_level + 1)
-    y_splits = get_even_samples(img.shape[1], 2**split_level + 1)
+    x_tile_borders = get_even_samples(img.shape[0], 2**split_level + 1)
+    y_tile_borders = get_even_samples(img.shape[1], 2**split_level + 1)
 
     tiles: list[list[ndarray]] = []
 
-    for x in range(len(y_splits) - 1):
+    for x in range(len(y_tile_borders) - 1):
         row = []
-        for y in range(len(x_splits) - 1):
+        for y in range(len(x_tile_borders) - 1):
             s = (
-                slice(x_splits[x], x_splits[x + 1]),
-                slice(y_splits[y], y_splits[y + 1]),
+                slice(x_tile_borders[x], x_tile_borders[x + 1]),
+                slice(y_tile_borders[y], y_tile_borders[y + 1]),
             )
             tile = img[s]
             row.append(tile)
@@ -93,11 +93,11 @@ def stitch_tiles(tiles: list[list[ndarray]]) -> ndarray:
             if y == 0:
                 row = tiles[x][y]
             else:
-                row = np.concatenate((row, tiles[x][y]), axis=0)
+                row = np.concatenate((row, tiles[x][y]), axis=1)
         if x == 0:
             result = row
         else:
-            result = np.concatenate((result, row), axis=1)
+            result = np.concatenate((result, row), axis=0)
 
     return result
 

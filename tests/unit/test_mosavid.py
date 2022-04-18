@@ -24,13 +24,13 @@ class TestStitchTiles:
             [np.array([[[BLACK_PIXEL]]]), np.array([[[WHITE_PIXEL]]])],
             [np.array([[[WHITE_PIXEL]]]), np.array([[[BLACK_PIXEL]]])],
         ]
-        expected_black_image = np.array(
+        expected_image = np.array(
             [[[BLACK_PIXEL], [WHITE_PIXEL]], [[WHITE_PIXEL], [BLACK_PIXEL]]]
         )
 
         image = stitch_tiles(tiles)
 
-        assert (image == expected_black_image).all()
+        assert (image == expected_image).all()
 
 
 class TestMeanColorEuclidianDistance:
