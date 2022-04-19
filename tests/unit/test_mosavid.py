@@ -1,34 +1,31 @@
 import pytest
 import cv2
 import numpy as np
+import unittest
 
 from project.mosavid import (
     get_frames_from_video,
     split_image_into_tiles,
     get_even_samples,
     mean_color_euclidian_distance,
-    stitch_tiles,
+    stitch,
     InvalidSplitLevel,
 )
 
-TEST_MP4_PATH = "data/test_video.mp4"
-TEST_JPG_PATH = "data/pic1.jpg"
-
-BLACK_PIXEL = [0, 0, 0]
-WHITE_PIXEL = [256, 256, 256]
+from tests.utils import *
 
 
 class TestStitchTiles:
     def test__when_called_with_4_pixels_as_tiles__returns_them_as_1_array(self):
         tiles = [
-            [np.array([[[BLACK_PIXEL]]]), np.array([[[WHITE_PIXEL]]])],
-            [np.array([[[WHITE_PIXEL]]]), np.array([[[BLACK_PIXEL]]])],
+            [black_img(), white_img()],
+            [white_img(), black_img()],
         ]
         expected_image = np.array(
-            [[[BLACK_PIXEL], [WHITE_PIXEL]], [[WHITE_PIXEL], [BLACK_PIXEL]]]
+            [[BLACK_PIXEL, WHITE_PIXEL], [WHITE_PIXEL, BLACK_PIXEL]]
         )
 
-        image = stitch_tiles(tiles)
+        image = stitch(tiles)
 
         assert (image == expected_image).all()
 
@@ -41,19 +38,27 @@ class TestMeanColorEuclidianDistance:
 
         assert dst == 0.0
 
-    def test__when_called_with_black_and_white_pixels__returns_body_diagonal_of_cube_with_256_long_edges(
+    def test__when_called_with_black_and_white_pixels__returns_body_diagonal_of_cube_with_255_long_edges(
         self,
     ):
-        black = np.array([[BLACK_PIXEL]])
-        white = np.array([[WHITE_PIXEL]])
+        # return value of tested function is rounded differently hence the use of str
+        expected_dst = 255 * np.sqrt(3)
+        expected_dst = str(expected_dst)
 
-        dst = mean_color_euclidian_distance(black, white)
+        dst = mean_color_euclidian_distance(black_img(), white_img())
+        dst = str(dst)
 
-        assert dst == 256 * np.sqrt(3)
+        assert dst[: len(dst) - 1] == expected_dst[: len(expected_dst) - 2]
+
+    def test__order_of_inputs_does_not_influence_result(self):
+        result_1 = mean_color_euclidian_distance(BLACK_IMG, WHITE_IMG)
+        result_2 = mean_color_euclidian_distance(WHITE_IMG, BLACK_IMG)
+
+        assert result_1 == result_2
 
 
 class TestGetFramesFromVideo:
-    def test__when_called__returns_right_number_of_frames(self):
+    def test__when_called_with_test_mp4__returns_right_number_of_frames(self):
         frames = get_frames_from_video(TEST_MP4_PATH)
         assert len(frames) == 145
 
