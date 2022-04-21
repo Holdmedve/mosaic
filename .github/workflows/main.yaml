@@ -20,6 +20,10 @@ jobs:
         uses: py-actions/py-dependency-install@v3
         with:
           path: "test_requirements.txt"
+      - name: Authenticate
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
       - name: Run tests
         run: make test
       
