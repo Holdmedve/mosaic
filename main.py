@@ -1,6 +1,7 @@
 import os
 import imghdr
 
+from google.cloud import storage
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 
@@ -30,9 +31,14 @@ def root():
 
 @app.route("/", methods=["POST"])
 def upload_file():
-    uploaded_file = request.files["file"]
+    file = request.files["file"]
 
-    if _file_is_valid(uploaded_file.filename):
+    if _file_is_valid(file.filename):
+        storage_client = storage.Client()
+        bucket = storage_client.lookup_bucket("mosavid.appspot.com")
+        blob = bucket.blob(file.filename)
+        blob.upload_from_file(file)
+
         return "", 204
 
     return "Invalid file", 400

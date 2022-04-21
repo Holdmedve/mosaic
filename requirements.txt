@@ -4,3 +4,4 @@ pytest-mock==3.7.0
 requests==2.26.0
 numpy==1.22.3
 opencv-python==4.5.5.64
+google-cloud-storage==2.3.0
