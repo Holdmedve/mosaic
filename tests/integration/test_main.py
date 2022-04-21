@@ -1,12 +1,10 @@
 import pytest
-import os
 import base64
-import random
+
 
 from io import BytesIO
 from google.cloud import storage
 
-from werkzeug.datastructures import FileStorage
 
 SMALLEST_JPEG_B64 = """\
 /9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8Q
@@ -44,17 +42,16 @@ class TestMain:
 
         assert res.status_code == expected_status_code
 
-    def test__upload_file__file_stored_in_bucket(self, client, mock_file_check):
-        randint = random.randint(10000, 100000)
-        file_name = f"test-{randint}"
+    def test__upload_file__file_stored_in_bucket(
+        self, client, mock_file_check, random_file_name
+    ):
         data = {
-            "file": (BytesIO(base64.b64decode(SMALLEST_JPEG_B64)), file_name),
+            "file": (BytesIO(base64.b64decode(SMALLEST_JPEG_B64)), random_file_name),
         }
 
-        client.post("/", data=data, content_type="multipart/form-data")
+        client.post("/", data=data)
 
         blob_iterator = storage.Client().list_blobs("mosavid.appspot.com")
         blobs = [blob.name for blob in blob_iterator]
-        print(blobs)
 
-        assert file_name in blobs
+        assert random_file_name in blobs
