@@ -6,7 +6,9 @@ from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 
 app = Flask(
-    __name__, template_folder="project/templates", static_folder="project/static"
+    __name__,
+    template_folder="project/templates",
+    static_folder="project/static",
 )
 
 app.config["UPLOAD_EXTENSIONS"] = [".mp4", ".jpg", ".png", ".jpeg"]
@@ -15,10 +17,12 @@ app.config["UPLOAD_EXTENSIONS"] = [".mp4", ".jpg", ".png", ".jpeg"]
 def _file_is_valid(file: str) -> bool:
     filename = secure_filename(file)
     if filename == "":
+        print("empty filename")
         return False
 
     file_ext = os.path.splitext(filename)[1]
     if file_ext not in app.config["UPLOAD_EXTENSIONS"]:
+        print("file extension invalid")
         return False
 
     return True
@@ -29,19 +33,34 @@ def root():
     return render_template("index.html")
 
 
-@app.route("/", methods=["POST"])
-def upload_file():
-    file = request.files["file"]
+@app.route("/upload_video", methods=["POST"])
+def upload_video():
+    video = request.files["video"]
 
-    if _file_is_valid(file.filename):
+    if _file_is_valid(video.filename):
         storage_client = storage.Client()
         bucket = storage_client.lookup_bucket("mosavid.appspot.com")
-        blob = bucket.blob(file.filename)
-        blob.upload_from_file(file)
+        blob = bucket.blob(video.filename)
+        blob.upload_from_file(video)
 
         return "", 204
 
-    return "Invalid file", 400
+    return "Invalid video", 400
+
+
+@app.route("/upload_image", methods=["POST"])
+def upload_image():
+    image = request.files["image"]
+
+    if _file_is_valid(image.filename):
+        storage_client = storage.Client()
+        bucket = storage_client.lookup_bucket("mosavid.appspot.com")
+        blob = bucket.blob(image.filename)
+        blob.upload_from_file(image)
+
+        return "", 204
+
+    return "Invalid video", 400
 
 
 if __name__ == "__main__":
