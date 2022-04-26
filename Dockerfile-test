@@ -1,0 +1,22 @@
+FROM python:3.9.1-slim
+
+RUN apt-get update
+RUN apt-get -y upgrade
+
+# RUN apt-get update && apt-get install -y python3-opencv
+# RUN pip install opencv-python
+
+# RUN apt-get update
+# RUN apt-get install ffmpeg libsm6 libxext6  -y
+
+
+COPY test_requirements.txt /test_requirements.txt
+RUN pip3 install -r test_requirements.txt
+RUN rm test_requirements.txt
+
+COPY project home/project
+COPY tests home/tests
+COPY main.py home/main.py
+COPY mypy.ini home/mypy.ini
+
+WORKDIR /home

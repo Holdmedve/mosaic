@@ -10,7 +10,8 @@ class TestRoot:
     def test__get_root__result_contains_target_image_submit_form(self, client):
         res = client.get("/")
         assert (
-            b'<form method="POST" action="/" enctype="multipart/form-data">' in res.data
+            b'<form method="POST" action="/upload_image" enctype="multipart/form-data">'
+            in res.data
         )
         assert b'<label for="image">Select a target image:</label>' in res.data
         assert (
@@ -21,7 +22,8 @@ class TestRoot:
     def test__get_root__result_contains_video_submit_form(self, client):
         res = client.get("/")
         assert (
-            b'<form method="POST" action="/" enctype="multipart/form-data">' in res.data
+            b'<form method="POST" action="/upload_video" enctype="multipart/form-data">'
+            in res.data
         )
         assert b'<label for="video">Select a video:</label>' in res.data
         assert (

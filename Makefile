@@ -1,7 +1,17 @@
+start:
+	docker run -d -i --name=foobar mosavid
+
 test:
-	black main.py project tests
-	mypy main.py project tests
-	python -m pytest
+	docker exec foobar ls
+	docker exec foobar black main.py project tests
+	docker exec foobar mypy main.py project tests
+	docker exec foobar python -m pytest
 
 test-only:
-	python -m pytest $(TARGET)
+	docker exec python -m pytest $(TARGET)
+
+build:
+	docker build -t mosavid -f Dockerfile-test .
+
+stop:
+	docker stop foobar
