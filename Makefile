@@ -1,5 +1,5 @@
 start:
-	docker run -d -i --name=foobar mosavid
+	docker run -d -i --name=foobar -e "TERM=xterm-256color" mosavid
 
 test:
 	docker exec foobar ls
@@ -15,3 +15,4 @@ build:
 
 stop:
 	docker stop foobar
+	docker container rm foobar
