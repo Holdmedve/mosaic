@@ -1,14 +1,13 @@
 start:
-	docker run -d -i --name=foobar -e "TERM=xterm-256color" mosavid
+	docker run -d -i --name=foobar mosavid
 
 test:
-	docker exec foobar ls
-	docker exec foobar black main.py project tests
-	docker exec foobar mypy main.py project tests
-	docker exec foobar python -m pytest
+	docker exec -t foobar black main.py project tests
+	docker exec -t foobar mypy main.py project tests
+	docker exec -t foobar python -m pytest
 
 test-only:
-	docker exec python -m pytest $(TARGET)
+	docker exec -t python -m pytest $(TARGET)
 
 build:
 	docker build -t mosavid -f Dockerfile-test .
