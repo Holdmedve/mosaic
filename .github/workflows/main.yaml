@@ -5,37 +5,23 @@ on:
     branches: 
       - master
 
+env:
+  GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Build image
         run: make build
-      - name: Start container
-        run: make start
-
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-      - name: Install python
-        uses: actions/setup-python@v3
-        with: 
-          python-version: '3.9'
-      - name: Install dependencies
-        uses: py-actions/py-dependency-install@v3
-        with:
-          path: "test_requirements.txt"
       - name: Authenticate
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
+      - name: Start container
+        run: make up
       - name: Run tests
         run: make test
       
