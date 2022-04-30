@@ -1,9 +1,3 @@
-start:
-	docker run -d -i -v $(GOOGLE_APPLICATION_CREDENTIALS):/secret/key.json -e GOOGLE_APPLICATION_CREDENTIALS=/secret/key.json --name=foobar mosavid
-
-local-start:
-	docker run -d -i -v $(shell pwd)/key.json:/secret/key.json -e GOOGLE_APPLICATION_CREDENTIALS=/secret/key.json --name=foobar mosavid
-
 up:
 	echo $(GOOGLE_APPLICATION_CREDENTIALS)
 	docker run -d -i -v $(GOOGLE_APPLICATION_CREDENTIALS):/secret/key.json -e GOOGLE_APPLICATION_CREDENTIALS=/secret/key.json --name=foobar mosavid

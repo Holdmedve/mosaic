@@ -9,17 +9,6 @@ env:
   GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-      - name: Build image
-        run: make build
-      - name: Start container
-        run: make start
-
-
   test:
     needs: build
     runs-on: ubuntu-latest
