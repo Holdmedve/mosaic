@@ -8,9 +8,5 @@ COPY test_requirements.txt /test_requirements.txt
 RUN pip3 install -r test_requirements.txt
 RUN rm test_requirements.txt
 
-COPY project home/project
-COPY tests home/tests
-COPY main.py home/main.py
-COPY mypy.ini home/mypy.ini
-
 WORKDIR /home
+ENTRYPOINT [ "/bin/bash", "-l", "-c" ]

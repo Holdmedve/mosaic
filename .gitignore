@@ -10,6 +10,9 @@ videos
 env
 mosavid
 
+tests/cypress/*
+!tests/cypress/integration
+
 *.json
 
 ./*.pyc

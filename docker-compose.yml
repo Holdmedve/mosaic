@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.test
+    working_dir: /home
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/home/key.json
+      - ./project:/home/project
+      - ./tests:/home/tests
+      - ./main.py:/home/main.py
+      - ./mypy.ini:/home/mypy.ini
+      - ./cypress.json:/home/cypress.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/home/key.json
