@@ -40,4 +40,4 @@ jobs:
       - name: Run deploy
         uses: 'google-github-actions/deploy-appengine@v0'
         with:
-          version: "0.1"
+          version: "alpha"
