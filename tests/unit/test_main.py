@@ -3,33 +3,35 @@ from io import BytesIO
 
 
 class TestRoot:
-    def test__when_called__respones_ok(self, client):
-        res = client.get("/")
-        assert res.status_code == 200
+    pass
+    # TODO test behavior rather than content
+    # def test__when_called__respones_ok(self, client):
+    #     res = client.get("/")
+    #     assert res.status_code == 200
 
-    def test__get_root__result_contains_target_image_submit_form(self, client):
-        res = client.get("/")
-        assert (
-            b'<form method="POST" action="/upload_image" enctype="multipart/form-data">'
-            in res.data
-        )
-        assert b'<label for="image">Select a target image:</label>' in res.data
-        assert (
-            b'<input type="file" id="image" name="image" onchange="form.submit()">'
-            in res.data
-        )
+    # def test__get_root__result_contains_target_image_submit_form(self, client):
+    #     res = client.get("/")
+    #     assert (
+    #         b'<form method="POST" action="/upload_image" enctype="multipart/form-data">'
+    #         in res.data
+    #     )
+    #     assert b'<label for="image">Select a target image:</label>' in res.data
+    #     assert (
+    #         b'<input type="file" id="image" name="image" onchange="form.submit()">'
+    #         in res.data
+    #     )
 
-    def test__get_root__result_contains_video_submit_form(self, client):
-        res = client.get("/")
-        assert (
-            b'<form method="POST" action="/upload_video" enctype="multipart/form-data">'
-            in res.data
-        )
-        assert b'<label for="video">Select a video:</label>' in res.data
-        assert (
-            b'<input type="file" id="video" name="video" onchange="form.submit()">'
-            in res.data
-        )
+    # def test__get_root__result_contains_video_submit_form(self, client):
+    #     res = client.get("/")
+    #     assert (
+    #         b'<form method="POST" action="/upload_video" enctype="multipart/form-data">'
+    #         in res.data
+    #     )
+    #     assert b'<label for="video">Select a video:</label>' in res.data
+    #     assert (
+    #         b'<input type="file" id="video" name="video" onchange="form.submit()">'
+    #         in res.data
+    #     )
 
 
 class TestUpload:

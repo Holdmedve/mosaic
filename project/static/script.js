@@ -1,34 +1,7 @@
-var dragHandler = function(evt){
-  evt.preventDefault();
-};
+var btn = document.getElementById("btn_mosaic");
 
-var dropHandler = function(evt){
-  evt.preventDefault();
-  var files = evt.originalEvent.dataTransfer.files;
-  console.log(files[0]);
-};
+btn.addEventListener("click", alertMe);
 
-var dropHandlerSet = {
-  dragover: dragHandler,
-  drop: dropHandler
-};
-
-$(".droparea").on(dropHandlerSet);
-
-var dropHandler = function(evt){
-  evt.preventDefault();
-  var files = evt.originalEvent.dataTransfer.files;
-
-  var formData = new FormData();
-  formData.append("file2upload", files[0]);
-
-  var req = {
-      url: "/sendfile",
-      method: "post",
-      processData: false,
-      contentType: false,
-      data: formData
-  };
-
-  var promise = $.ajax(req);
-};
+function alertMe(){
+  console.log("The button has been clicked!");
+}

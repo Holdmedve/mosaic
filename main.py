@@ -1,9 +1,15 @@
+import base64
+import io
 import os
 import imghdr
+import cv2
+import numpy as np
 
 from google.cloud import storage
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
+
+# from PIL import Image
 
 app = Flask(
     __name__,
@@ -61,6 +67,20 @@ def upload_image():
         return "", 204
 
     return "Invalid video", 400
+
+
+@app.route("/create_mosaic", methods=["POST"])
+def create_mosaic():
+    image = request.files["image"]
+    video = request.files["video"]
+
+    image_np_array = np.asarray(bytearray(image.read()), dtype="uint8")
+    cv2image = cv2.imdecode(image_np_array, cv2.IMREAD_COLOR)
+    image.save("/temp/image")
+    # print(image)
+    video.save("/temp/video")
+
+    return "", 204
 
 
 if __name__ == "__main__":
