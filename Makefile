@@ -13,7 +13,13 @@ test-only:
 	docker exec -t python3 -m pytest $(TARGET)
 
 build:
-	docker build -t mosavid -f Dockerfile.test .
+	docker-compose build test
+
+build-shell:
+	docker-compose build shell
+
+run-shell:
+	docker-compose run shell
 
 stop:
 	docker stop foobar

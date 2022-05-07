@@ -14,3 +14,19 @@ services:
       - ./mypy.ini:/home/mypy.ini
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/home/key.json
+  shell:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.mkdir
+    entrypoint: /bin/sh
+    # stdin_open: true # docker run -i
+    # tty: true # docker run -t
+    working_dir: /
+    # volumes:
+    #   - ${GOOGLE_APPLICATION_CREDENTIALS}:/home/app/key.json
+    #   - ./project:/home/app/project
+    #   - ./tests:/home/app/tests
+    #   - ./main.py:/home/app/main.py
+    #   - ./mypy.ini:/home/app/mypy.ini
+    # environment:
+    #   - GOOGLE_APPLICATION_CREDENTIALS=/home/app/key.json
