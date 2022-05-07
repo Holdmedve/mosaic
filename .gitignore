@@ -12,6 +12,7 @@ mosavid
 
 tests/cypress/*
 !tests/cypress/integration
+!tests/cypress/cypress.json
 
 *.json
 

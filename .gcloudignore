@@ -23,3 +23,24 @@ example_output
 tests
 
 README.md
+
+.vscode
+.idea
+.pytest_cache
+
+__pycache__
+
+frames
+images
+videos
+env
+mosavid
+
+tests/cypress/*
+!tests/cypress/integration
+
+*.json
+
+./*.pyc
+./*.jpg
+./*.mp4

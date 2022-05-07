@@ -5,12 +5,12 @@
   <body>
     <form method="POST" action="/create_mosaic" enctype="multipart/form-data">
       <label for="image">Select a target image:</label>
-      <input type="file" id="image" name="image">
+      <input type="file" id="image_input" name="image">
 
       <label for="video">Select a video:</label>
-      <input type="file" id="video" name="video">
+      <input type="file" id="video_input" name="video">
 
-      <button type="submit" id="btn_mosaic"action="/create_mosaic">Create mosaic</button>
+      <button type="submit" id="submit_btn" action="/create_mosaic">Create mosaic</button>
     </form>
     
     <script src="{{url_for('static', filename='script.js')}}"></script>

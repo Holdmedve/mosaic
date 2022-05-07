@@ -12,6 +12,5 @@ services:
       - ./tests:/home/tests
       - ./main.py:/home/main.py
       - ./mypy.ini:/home/mypy.ini
-      - ./cypress.json:/home/cypress.json
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/home/key.json

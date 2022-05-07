@@ -8,5 +8,8 @@ COPY test_requirements.txt /test_requirements.txt
 RUN pip3 install -r test_requirements.txt
 RUN rm test_requirements.txt
 
+WORKDIR '/home/node_modules'
+RUN npm i cypress-file-upload
+
 WORKDIR /home
 ENTRYPOINT [ "/bin/bash", "-l", "-c" ]

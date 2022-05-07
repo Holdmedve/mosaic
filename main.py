@@ -2,12 +2,14 @@ import base64
 import io
 import os
 import imghdr
+import uuid
 import cv2
 import numpy as np
 
 from google.cloud import storage
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
+from project import mosavid
 
 # from PIL import Image
 
@@ -74,12 +76,15 @@ def create_mosaic():
     image = request.files["image"]
     video = request.files["video"]
 
-    image_np_array = np.asarray(bytearray(image.read()), dtype="uint8")
-    cv2image = cv2.imdecode(image_np_array, cv2.IMREAD_COLOR)
-    image.save("/temp/image")
+    # image_np_array = np.asarray(bytearray(image.read()), dtype="uint8")
+    # cv2image = cv2.imdecode(image_np_array, cv2.IMREAD_COLOR)
+    image_path = uuid.uuid1()
+    video_path = uuid.uuid1()
+    image.save(f"/tmp/{image_path}")
     # print(image)
-    video.save("/temp/video")
+    video.save(f"/tmp/{video_path}")
 
+    mosaic = mosavid.create_mosaic(image_path, video_path)
     return "", 204
 
 
@@ -91,4 +96,4 @@ if __name__ == "__main__":
     # the "static" directory. See:
     # http://flask.pocoo.org/docs/1.0/quickstart/#static-files. Once deployed,
     # App Engine itself will serve those files as configured in app.yaml.
-    app.run(host="127.0.0.1", port=8080, debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)
