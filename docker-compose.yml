@@ -5,15 +5,15 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.test
-    working_dir: /home
+    working_dir: /home/app
     volumes:
-      - ${GOOGLE_APPLICATION_CREDENTIALS}:/home/key.json
-      - ./project:/home/project
-      - ./tests:/home/tests
-      - ./main.py:/home/main.py
-      - ./mypy.ini:/home/mypy.ini
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/home/app/key.json
+      - ./project:/home/app/project
+      - ./tests:/home/app/tests
+      - ./main.py:/home/app/main.py
+      - ./mypy.ini:/home/app/mypy.ini
     environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/home/key.json
+      - GOOGLE_APPLICATION_CREDENTIALS=/home/app/key.json
   shell:
     build:
       context: .

@@ -2,7 +2,7 @@ up:
 	docker-compose up -d --remove-orphans test
 
 test-e2e:
-	docker-compose run -w /home/tests test "cypress run"
+	docker-compose run -w /home/app/tests test "cypress run"
 
 test:
 	docker-compose run test "black ."
