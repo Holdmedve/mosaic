@@ -1,4 +1,4 @@
-var btn = document.getElementById("btn_mosaic");
+var btn = document.getElementById("submit_btn");
 
 btn.addEventListener("click", alertMe);
 

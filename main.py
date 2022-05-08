@@ -21,6 +21,8 @@ app = Flask(
 
 app.config["UPLOAD_EXTENSIONS"] = [".mp4", ".jpg", ".png", ".jpeg"]
 
+TEMP_CONTENT_PATH = "/tmp"
+
 
 def _file_is_valid(file: str) -> bool:
     filename = secure_filename(file)
@@ -41,51 +43,24 @@ def root():
     return render_template("index.html")
 
 
-@app.route("/upload_video", methods=["POST"])
-def upload_video():
-    video = request.files["video"]
-
-    if _file_is_valid(video.filename):
-        storage_client = storage.Client()
-        bucket = storage_client.lookup_bucket("mosavid.appspot.com")
-        blob = bucket.blob(video.filename)
-        blob.upload_from_file(video)
-
-        return "", 204
-
-    return "Invalid video", 400
-
-
-@app.route("/upload_image", methods=["POST"])
-def upload_image():
-    image = request.files["image"]
-
-    if _file_is_valid(image.filename):
-        storage_client = storage.Client()
-        bucket = storage_client.lookup_bucket("mosavid.appspot.com")
-        blob = bucket.blob(image.filename)
-        blob.upload_from_file(image)
-
-        return "", 204
-
-    return "Invalid video", 400
-
-
 @app.route("/create_mosaic", methods=["POST"])
 def create_mosaic():
     image = request.files["image"]
     video = request.files["video"]
 
-    # image_np_array = np.asarray(bytearray(image.read()), dtype="uint8")
-    # cv2image = cv2.imdecode(image_np_array, cv2.IMREAD_COLOR)
-    image_path = uuid.uuid1()
-    video_path = uuid.uuid1()
-    image.save(f"/tmp/{image_path}")
-    # print(image)
-    video.save(f"/tmp/{video_path}")
+    image_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
+    video_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
+    # image.save(f"/tmp/{image_path}")
+    # video.save(f"/tmp/{video_path}")
+    image.save(image_path)
+    video.save(video_path)
 
     mosaic = mosavid.create_mosaic(image_path, video_path)
-    return "", 204
+    mosaic_file_name = f"{uuid.uuid1()}.png"
+    mosaic_file_path = f"{TEMP_CONTENT_PATH}/{mosaic_file_name}"
+    cv2.imwrite(filename=mosaic_file_path, img=mosaic)
+
+    return render_template("index.html", mosaic=mosaic_file_name)
 
 
 if __name__ == "__main__":
@@ -96,4 +71,5 @@ if __name__ == "__main__":
     # the "static" directory. See:
     # http://flask.pocoo.org/docs/1.0/quickstart/#static-files. Once deployed,
     # App Engine itself will serve those files as configured in app.yaml.
+    TEMP_CONTENT_PATH = "project/static"
     app.run(host="127.0.0.1", port=5000, debug=True)

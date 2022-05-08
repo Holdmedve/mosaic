@@ -34,57 +34,57 @@ class TestRoot:
     #     )
 
 
-class TestUpload:
-    def test__upload_video__response_ok(self, client):
-        data = {
-            "video": (BytesIO(bytes()), "my_video.mp4"),
-        }
-        res = client.post("/upload_video", data=data)
-        assert res.status_code == 204
+# class TestUpload:
+#     def test__upload_video__response_ok(self, client):
+#         data = {
+#             "video": (BytesIO(bytes()), "my_video.mp4"),
+#         }
+#         res = client.post("/upload_video", data=data)
+#         assert res.status_code == 204
 
-    def test__upload_image__response_ok(self, client):
-        data = {
-            "image": (BytesIO(bytes()), "my_image.jpg"),
-        }
-        res = client.post("/upload_image", data=data)
-        assert res.status_code == 204
+#     def test__upload_image__response_ok(self, client):
+#         data = {
+#             "image": (BytesIO(bytes()), "my_image.jpg"),
+#         }
+#         res = client.post("/upload_image", data=data)
+#         assert res.status_code == 204
 
-    @pytest.mark.parametrize(
-        "image, expected_status_code",
-        [
-            ("test_image.jpg", 204),
-            ("clearly_malicious_content.exe", 400),
-            ("", 400),
-        ],
-    )
-    def test__when_uploading_image__only_accepts_expected_type(
-        self, app, client, image, expected_status_code, mock_storage
-    ):
-        app.config["UPLOAD_EXTENSIONS"] = [".jpg"]
-        data = {
-            "image": (BytesIO(bytes()), image),
-        }
+#     @pytest.mark.parametrize(
+#         "image, expected_status_code",
+#         [
+#             ("test_image.jpg", 204),
+#             ("clearly_malicious_content.exe", 400),
+#             ("", 400),
+#         ],
+#     )
+#     def test__when_uploading_image__only_accepts_expected_type(
+#         self, app, client, image, expected_status_code, mock_storage
+#     ):
+#         app.config["UPLOAD_EXTENSIONS"] = [".jpg"]
+#         data = {
+#             "image": (BytesIO(bytes()), image),
+#         }
 
-        res = client.post("/upload_image", data=data)
+#         res = client.post("/upload_image", data=data)
 
-        assert res.status_code == expected_status_code
+#         assert res.status_code == expected_status_code
 
-    @pytest.mark.parametrize(
-        "video, expected_status_code",
-        [
-            ("test_video.mp4", 204),
-            ("clearly_malicious_content.exe", 400),
-            ("", 400),
-        ],
-    )
-    def test__when_uploading_video__only_accepts_expected_type(
-        self, app, client, video, expected_status_code, mock_storage
-    ):
-        app.config["UPLOAD_EXTENSIONS"] = [".mp4"]
-        data = {
-            "video": (BytesIO(bytes()), video),
-        }
+#     @pytest.mark.parametrize(
+#         "video, expected_status_code",
+#         [
+#             ("test_video.mp4", 204),
+#             ("clearly_malicious_content.exe", 400),
+#             ("", 400),
+#         ],
+#     )
+#     def test__when_uploading_video__only_accepts_expected_type(
+#         self, app, client, video, expected_status_code, mock_storage
+#     ):
+#         app.config["UPLOAD_EXTENSIONS"] = [".mp4"]
+#         data = {
+#             "video": (BytesIO(bytes()), video),
+#         }
 
-        res = client.post("/upload_video", data=data)
+#         res = client.post("/upload_video", data=data)
 
-        assert res.status_code == expected_status_code
+#         assert res.status_code == expected_status_code
