@@ -1,0 +1,32 @@
+MUST:
+- align tests with the implementation changes
+    there are multiple tests commented out
+-
+- memory limit reached on app engine
+    profile mosaic creation logic, optimize
+- create test that runs after deploy
+    run e2e test/endpoint directly
+- make quality tests for mosaic creation logic
+    collect an image-video pair that produces nice result
+    make a test with them
+- make functional split level ui element
+    dropdown of numbers
+- refactor mosavid logic
+    magic numbers
+    dataclass for image, video, split level
+
+
+NICE_TO_HAVE:
+- multiple comparison methods
+- mosaic creation does not redirect
+    therefore it remembers the form inputs
+- progress bar
+    let the user know something is happening
+- error message for too big files
+    filter request files based on size
+- being able to reach the container through browser
+    container runs locally with flask
+    reach it from browser
+    not easily possible using windows
+
+
