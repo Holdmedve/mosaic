@@ -15,7 +15,9 @@ tests/cypress/*
 !tests/cypress/cypress.json
 
 *.json
+*.prof
 
 ./*.pyc
 ./*.jpg
 ./*.mp4
+

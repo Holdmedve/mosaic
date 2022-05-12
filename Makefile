@@ -24,3 +24,7 @@ run-shell:
 stop:
 	docker stop foobar
 	docker container rm foobar
+
+# snakeviz snakeviz.prof to view output in browser
+profile:
+	python -m cProfile -o snakeviz.prof profiler.py
