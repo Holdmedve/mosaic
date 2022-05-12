@@ -10,7 +10,7 @@ test:
 	docker-compose run test pytest
 
 test-only:
-	docker exec -t python3 -m pytest $(TARGET)
+	docker-compose run test "pytest $(TARGET)"
 
 build:
 	docker-compose build test

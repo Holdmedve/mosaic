@@ -1,7 +1,6 @@
 MUST:
 - align tests with the implementation changes
     there are multiple tests commented out
--
 - memory limit reached on app engine
     profile mosaic creation logic, optimize
 - create test that runs after deploy
