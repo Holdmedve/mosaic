@@ -10,7 +10,7 @@ from project.mosavid import (
     split_image_into_tiles,
     find_best_fitting_frame,
     mean_color_euclidian_distance,
-    create_mosaic,
+    create_mosaic_from_video,
     get_best_fitting_frames,
 )
 
@@ -25,7 +25,7 @@ def test__split_into_tiles_and_stitcing_back_together__results_in_original_image
 
 
 def test_create_mosaic__when_called__executes_without_errors():
-    create_mosaic(TEST_JPG_PATH, TEST_MP4_PATH)
+    create_mosaic_from_video(TEST_JPG_PATH, TEST_MP4_PATH)
 
 
 def test_get_best_fitting_frames__executes_without_errors():

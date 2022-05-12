@@ -50,12 +50,12 @@ def create_mosaic():
 
     image_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
     video_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
-    # image.save(f"/tmp/{image_path}")
-    # video.save(f"/tmp/{video_path}")
     image.save(image_path)
     video.save(video_path)
 
-    mosaic = mosavid.create_mosaic(image_path, video_path)
+    mosaic = mosavid.create_mosaic_from_video(
+        target_img_path=image_path, source_video_path=video_path
+    )
     mosaic_file_name = f"{uuid.uuid1()}.png"
     mosaic_file_path = f"{TEMP_CONTENT_PATH}/{mosaic_file_name}"
     cv2.imwrite(filename=mosaic_file_path, img=mosaic)

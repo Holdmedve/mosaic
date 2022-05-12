@@ -142,9 +142,9 @@ def get_best_fitting_frames(
     return best_fitting_frames
 
 
-def create_mosaic(target_img_path: str, video_path: str) -> ndarray:
+def create_mosaic_from_video(target_img_path: str, source_video_path: str) -> ndarray:
     target_tiles: list[list[ndarray]] = split_image_into_tiles(target_img_path, 2)
-    frames: list[ndarray] = get_frames_from_video(video_path)
+    frames: list[ndarray] = get_frames_from_video(source_video_path)
 
     best_fitting_frames: list[list[ndarray]] = get_best_fitting_frames(
         target_tiles, frames, mean_color_euclidian_distance

@@ -1,90 +1,57 @@
+import os
 import pytest
 from io import BytesIO
 
-
-class TestRoot:
-    pass
-    # TODO test behavior rather than content
-    # def test__when_called__respones_ok(self, client):
-    #     res = client.get("/")
-    #     assert res.status_code == 200
-
-    # def test__get_root__result_contains_target_image_submit_form(self, client):
-    #     res = client.get("/")
-    #     assert (
-    #         b'<form method="POST" action="/upload_image" enctype="multipart/form-data">'
-    #         in res.data
-    #     )
-    #     assert b'<label for="image">Select a target image:</label>' in res.data
-    #     assert (
-    #         b'<input type="file" id="image" name="image" onchange="form.submit()">'
-    #         in res.data
-    #     )
-
-    # def test__get_root__result_contains_video_submit_form(self, client):
-    #     res = client.get("/")
-    #     assert (
-    #         b'<form method="POST" action="/upload_video" enctype="multipart/form-data">'
-    #         in res.data
-    #     )
-    #     assert b'<label for="video">Select a video:</label>' in res.data
-    #     assert (
-    #         b'<input type="file" id="video" name="video" onchange="form.submit()">'
-    #         in res.data
-    #     )
+from main import TEMP_CONTENT_PATH
 
 
-# class TestUpload:
-#     def test__upload_video__response_ok(self, client):
-#         data = {
-#             "video": (BytesIO(bytes()), "my_video.mp4"),
-#         }
-#         res = client.post("/upload_video", data=data)
-#         assert res.status_code == 204
+def test__create_mosaic__send_request__does_not_throw_exception(client):
+    data = {
+        "video": (BytesIO(bytes()), "video"),
+        "image": (BytesIO(bytes()), "image"),
+    }
 
-#     def test__upload_image__response_ok(self, client):
-#         data = {
-#             "image": (BytesIO(bytes()), "my_image.jpg"),
-#         }
-#         res = client.post("/upload_image", data=data)
-#         assert res.status_code == 204
+    client.post("/create_mosaic", data=data)
 
-#     @pytest.mark.parametrize(
-#         "image, expected_status_code",
-#         [
-#             ("test_image.jpg", 204),
-#             ("clearly_malicious_content.exe", 400),
-#             ("", 400),
-#         ],
-#     )
-#     def test__when_uploading_image__only_accepts_expected_type(
-#         self, app, client, image, expected_status_code, mock_storage
-#     ):
-#         app.config["UPLOAD_EXTENSIONS"] = [".jpg"]
-#         data = {
-#             "image": (BytesIO(bytes()), image),
-#         }
 
-#         res = client.post("/upload_image", data=data)
+def test__create_mosaic__saves_video_and_image_from_request(client, mocker):
+    mocker.patch("main.mosavid.create_mosaic_from_video")
+    delete_all_files_in_directory(TEMP_CONTENT_PATH)
+    data = {
+        "video": (BytesIO(bytes()), "video"),
+        "image": (BytesIO(bytes()), "image"),
+    }
 
-#         assert res.status_code == expected_status_code
+    client.post("/create_mosaic", data=data)
 
-#     @pytest.mark.parametrize(
-#         "video, expected_status_code",
-#         [
-#             ("test_video.mp4", 204),
-#             ("clearly_malicious_content.exe", 400),
-#             ("", 400),
-#         ],
-#     )
-#     def test__when_uploading_video__only_accepts_expected_type(
-#         self, app, client, video, expected_status_code, mock_storage
-#     ):
-#         app.config["UPLOAD_EXTENSIONS"] = [".mp4"]
-#         data = {
-#             "video": (BytesIO(bytes()), video),
-#         }
+    _, _, files = next(os.walk(TEMP_CONTENT_PATH))
+    assert len(files) == 2
 
-#         res = client.post("/upload_video", data=data)
 
-#         assert res.status_code == expected_status_code
+def test__root__response_contains_right_input_elements(client):
+    response = client.get("/")
+
+    assert b'<input type="file" id="image_input" name="image">' in response.data
+    assert b'<input type="file" id="video_input" name="video">' in response.data
+
+
+def test__root__response_contains_form_with_right_attributes(client):
+    response = client.get("/")
+
+    assert (
+        b'<form method="POST" action="/create_mosaic" enctype="multipart/form-data">'
+        in response.data
+    )
+
+
+def test__root__translates_url_for_static_folder(client):
+    response = client.get("/")
+
+    assert b'img src="/static/"' in response.data
+
+
+def delete_all_files_in_directory(directory_path: str) -> None:
+    for path in os.listdir(directory_path):
+        full_path = os.path.join(directory_path, path)
+        if not os.path.isdir(full_path):
+            os.remove(full_path)
