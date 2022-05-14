@@ -5,8 +5,6 @@ test-e2e:
 	docker-compose run -w /home/app/tests test "cypress run"
 
 test:
-	docker-compose run test "black ."
-	docker-compose run test "mypy main.py project tests"
 	docker-compose run test pytest
 
 test-only:
@@ -20,6 +18,10 @@ build-shell:
 
 run-shell:
 	docker-compose run shell
+
+code-format:
+	docker-compose run test "black ."
+	docker-compose run test "mypy --strict ."
 
 stop:
 	docker stop foobar

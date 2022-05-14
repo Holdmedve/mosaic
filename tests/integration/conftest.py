@@ -1,25 +1,21 @@
 import pytest
 import random
 from main import app as flask_app
+from typing import Any
 
 
 @pytest.fixture
-def app():
+def app() -> Any:
     yield flask_app
 
 
 @pytest.fixture
-def client(app):
+def client(app: Any) -> Any:
     return app.test_client()
 
 
 @pytest.fixture
-def mock_file_check(mocker):
-    return mocker.patch("main._file_is_valid", return_value=True)
-
-
-@pytest.fixture
-def random_file_name():
+def random_file_name() -> str:
     randint = random.randint(10000, 100000)
     file_name = f"test-{randint}"
     return file_name

@@ -14,32 +14,16 @@ app = Flask(
     static_folder="project/static",
 )
 
-app.config["UPLOAD_EXTENSIONS"] = [".mp4", ".jpg", ".png", ".jpeg"]
-
 TEMP_CONTENT_PATH = "/tmp"
 
 
-def _file_is_valid(file: str) -> bool:
-    filename = secure_filename(file)
-    if filename == "":
-        print("empty filename")
-        return False
-
-    file_ext = os.path.splitext(filename)[1]
-    if file_ext not in app.config["UPLOAD_EXTENSIONS"]:
-        print("file extension invalid")
-        return False
-
-    return True
-
-
 @app.route("/")
-def root():
+def root() -> str:
     return render_template("index.html")
 
 
 @app.route("/create_mosaic", methods=["POST"])
-def create_mosaic():
+def create_mosaic() -> str:
     image = request.files["image"]
     video = request.files["video"]
 

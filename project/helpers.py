@@ -1,36 +1,29 @@
 import math
 import os
-from dataclasses import dataclass
 import cv2  # type: ignore
 
 from typing import List
-from cv2 import sqrt
+from numpy.typing import NDArray
 from numpy import ndarray
 
 
 import numpy as np
 
 from project.exceptions import InvalidSplitLevel
-
-
-@dataclass
-class MosaicData:
-    requested_tile_count: int
-    target_image_path: str
-    source_video_path: str
+from project.mosaic_data import MosaicData
 
 
 def get_even_samples(to_sample: int, n: int) -> tuple[int, ...]:
     return tuple(map(lambda x: int(x), np.linspace(0, to_sample, n)))
 
 
-def split_image_into_tiles(data: MosaicData) -> list[list[ndarray]]:
+def split_image_into_tiles(data: MosaicData) -> list[list[NDArray[np.int32]]]:
     img = cv2.imread(data.target_image_path)
     tile_count_along_1_dimension_plus_1 = int(math.sqrt(data.requested_tile_count)) + 1
     x_tile_borders = get_even_samples(img.shape[0], tile_count_along_1_dimension_plus_1)
     y_tile_borders = get_even_samples(img.shape[1], tile_count_along_1_dimension_plus_1)
 
-    tiles: list[list[ndarray]] = []
+    tiles: list[list[NDArray[np.int32]]] = []
 
     for x in range(len(y_tile_borders) - 1):
         row = []
@@ -46,7 +39,7 @@ def split_image_into_tiles(data: MosaicData) -> list[list[ndarray]]:
     return tiles
 
 
-def get_frames_from_video(vid_path: str) -> List[ndarray]:
+def get_frames_from_video(vid_path: str) -> list[NDArray[np.int32]]:
     capture = cv2.VideoCapture(vid_path)
     frames = []
 

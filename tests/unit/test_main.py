@@ -1,11 +1,12 @@
 import os
 import pytest
 from io import BytesIO
+from typing import Any
 
 from main import TEMP_CONTENT_PATH
 
 
-def test__create_mosaic__send_request__does_not_throw_exception(client):
+def test__create_mosaic__send_request__does_not_throw_exception(client: Any) -> None:
     data = {
         "video": (BytesIO(bytes()), "video"),
         "image": (BytesIO(bytes()), "image"),
@@ -14,7 +15,9 @@ def test__create_mosaic__send_request__does_not_throw_exception(client):
     client.post("/create_mosaic", data=data)
 
 
-def test__create_mosaic__saves_video_and_image_from_request(client, mocker):
+def test__create_mosaic__saves_video_and_image_from_request(
+    client: Any, mocker: Any
+) -> None:
     mocker.patch("main.mosavid.create_mosaic_from_video")
     delete_all_files_in_directory(TEMP_CONTENT_PATH)
     data = {
@@ -28,14 +31,14 @@ def test__create_mosaic__saves_video_and_image_from_request(client, mocker):
     assert len(files) == 2
 
 
-def test__root__response_contains_right_input_elements(client):
+def test__root__response_contains_right_input_elements(client: Any) -> None:
     response = client.get("/")
 
     assert b'<input type="file" id="image_input" name="image">' in response.data
     assert b'<input type="file" id="video_input" name="video">' in response.data
 
 
-def test__root__response_contains_form_with_right_attributes(client):
+def test__root__response_contains_form_with_right_attributes(client: Any) -> None:
     response = client.get("/")
 
     assert (
@@ -44,7 +47,7 @@ def test__root__response_contains_form_with_right_attributes(client):
     )
 
 
-def test__root__translates_url_for_static_folder(client):
+def test__root__translates_url_for_static_folder(client: Any) -> None:
     response = client.get("/")
 
     assert b'img src="/static/"' in response.data

@@ -20,6 +20,8 @@ jobs:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
       - name: Start container
         run: make up
+      - name: Run code format
+        run: make code-format
       - name: Run tests
         run: make test
       
