@@ -1,9 +1,10 @@
 import cv2
+from project.helpers import MosaicData
 
 from tests.utils import *
 
 from project.mosavid import (
-    stitch,
+    stitch_images_together,
     split_image_into_tiles,
     find_best_fitting_frame,
     mean_color_euclidian_distance,
@@ -13,10 +14,15 @@ from project.mosavid import (
 
 
 def test__split_into_tiles_and_stitcing_back_together__results_in_original_image():
+    data = MosaicData(
+        target_image_path=TEST_JPG_PATH,
+        source_video_path=TEST_MP4_PATH,
+        requested_tile_count=2,
+    )
     original_image = cv2.imread(TEST_JPG_PATH)
 
-    tiles = split_image_into_tiles(TEST_JPG_PATH, 2)
-    stitched_image = stitch(tiles)
+    tiles = split_image_into_tiles(data=data)
+    stitched_image = stitch_images_together(tiles)
 
     assert (original_image == stitched_image).all()
 
@@ -31,23 +37,23 @@ def test_get_best_fitting_frames__executes_without_errors():
     get_best_fitting_frames(tiles, frames, mean_color_euclidian_distance)
 
 
-class TestFindBestFittingFrame:
-    def test__when_called__returns_frame_most_similar_to_tile(self):
-        tile = black_img()
-        frames = [white_img(), black_img(), white_img()]
+def test__find_best_fitting_frame__returns_frame_most_similar_to_tile():
+    tile = black_img()
+    frames = [white_img(), black_img(), white_img()]
 
-        best_fit = find_best_fitting_frame(
-            tile=tile, frames=frames, comparison_fn=mean_color_euclidian_distance
-        )
+    best_fit = find_best_fitting_frame(
+        tile=tile, frames=frames, comparison_fn=mean_color_euclidian_distance
+    )
 
-        assert (best_fit == black_img()).all()
+    assert (best_fit == black_img()).all()
 
-    def test__when_called_with_equally_similar_frames__returns_first_one(self):
-        tile = black_img()
-        frames = [green_img(), blue_img(), red_img()]
 
-        best_fit = find_best_fitting_frame(
-            tile=tile, frames=frames, comparison_fn=mean_color_euclidian_distance
-        )
+def test__find_best_fitting_frame__when_called_with_equally_similar_frames__returns_first_one():
+    tile = black_img()
+    frames = [green_img(), blue_img(), red_img()]
 
-        assert (best_fit == frames[0]).all()
+    best_fit = find_best_fitting_frame(
+        tile=tile, frames=frames, comparison_fn=mean_color_euclidian_distance
+    )
+
+    assert (best_fit == frames[0]).all()

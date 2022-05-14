@@ -1,8 +1,10 @@
+import math
 import os
 from dataclasses import dataclass
 import cv2  # type: ignore
 
 from typing import List
+from cv2 import sqrt
 from numpy import ndarray
 
 
@@ -12,8 +14,8 @@ from project.exceptions import InvalidSplitLevel
 
 
 @dataclass
-class Data:
-    requested_split_level: int
+class MosaicData:
+    requested_tile_count: int
     target_image_path: str
     source_video_path: str
 
@@ -22,12 +24,11 @@ def get_even_samples(to_sample: int, n: int) -> tuple[int, ...]:
     return tuple(map(lambda x: int(x), np.linspace(0, to_sample, n)))
 
 
-def split_image_into_tiles(img_path: str, split_level: int) -> list[list[ndarray]]:
-
-    img = cv2.imread(img_path)
-
-    x_tile_borders = get_even_samples(img.shape[0], 2**split_level + 1)
-    y_tile_borders = get_even_samples(img.shape[1], 2**split_level + 1)
+def split_image_into_tiles(data: MosaicData) -> list[list[ndarray]]:
+    img = cv2.imread(data.target_image_path)
+    tile_count_along_1_dimension_plus_1 = int(math.sqrt(data.requested_tile_count)) + 1
+    x_tile_borders = get_even_samples(img.shape[0], tile_count_along_1_dimension_plus_1)
+    y_tile_borders = get_even_samples(img.shape[1], tile_count_along_1_dimension_plus_1)
 
     tiles: list[list[ndarray]] = []
 
@@ -46,7 +47,6 @@ def split_image_into_tiles(img_path: str, split_level: int) -> list[list[ndarray
 
 
 def get_frames_from_video(vid_path: str) -> List[ndarray]:
-
     capture = cv2.VideoCapture(vid_path)
     frames = []
 
@@ -62,8 +62,8 @@ def get_frames_from_video(vid_path: str) -> List[ndarray]:
     return frames
 
 
-def is_data_valid(data: Data) -> bool:
-    if data.requested_split_level < 1:
+def is_data_valid(data: MosaicData) -> bool:
+    if data.requested_tile_count < 1:
         raise InvalidSplitLevel("split level must be at least 1")
 
     if not os.path.exists(data.source_video_path):

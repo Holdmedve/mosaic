@@ -1,20 +1,19 @@
 import numpy as np
 
 from dataclasses import dataclass
-from numpy import ndarray
+from numpy import ndarray, source
 from typing import Callable
 from project.distance import mean_color_euclidian_distance
 
-from project.helpers import get_frames_from_video, split_image_into_tiles
+from project.helpers import (
+    MosaicData,
+    get_frames_from_video,
+    is_data_valid,
+    split_image_into_tiles,
+)
 
 
-@dataclass
-class Config:
-    split_level: int
-    comparison_method: Callable[[ndarray, ndarray], float]
-
-
-def stitch(images: list[list[ndarray]]) -> ndarray:
+def stitch_images_together(images: list[list[ndarray]]) -> ndarray:
     result: ndarray
 
     for x in range(len(images)):
@@ -73,13 +72,21 @@ def get_best_fitting_frames(
 
 
 def create_mosaic_from_video(target_img_path: str, source_video_path: str) -> ndarray:
-    target_tiles: list[list[ndarray]] = split_image_into_tiles(target_img_path, 2)
-    frames: list[ndarray] = get_frames_from_video(source_video_path)
+    data = MosaicData(
+        target_image_path=target_img_path,
+        source_video_path=source_video_path,
+        requested_tile_count=2,
+    )
+    if not is_data_valid(data):
+        return np.array([])
+
+    target_tiles: list[list[ndarray]] = split_image_into_tiles(data)
+    frames: list[ndarray] = get_frames_from_video(data.source_video_path)
 
     best_fitting_frames: list[list[ndarray]] = get_best_fitting_frames(
         target_tiles, frames, mean_color_euclidian_distance
     )
 
-    result: ndarray = stitch(best_fitting_frames)
+    result: ndarray = stitch_images_together(best_fitting_frames)
 
     return result
