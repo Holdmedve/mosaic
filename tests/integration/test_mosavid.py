@@ -1,7 +1,4 @@
 import cv2
-import pytest
-
-import numpy as np
 
 from tests.utils import *
 

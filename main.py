@@ -1,12 +1,7 @@
-import base64
-import io
 import os
-import imghdr
 import uuid
 import cv2
-import numpy as np
 
-from google.cloud import storage
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 from project import mosavid

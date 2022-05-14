@@ -1,0 +1,2 @@
+class InvalidSplitLevel(Exception):
+    pass

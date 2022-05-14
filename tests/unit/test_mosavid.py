@@ -1,16 +1,17 @@
+from plistlib import InvalidFileException
 import pytest
 import cv2
 import numpy as np
-import unittest
 
 from project.mosavid import (
     get_frames_from_video,
     split_image_into_tiles,
-    get_even_samples,
     mean_color_euclidian_distance,
     stitch,
-    InvalidSplitLevel,
 )
+from project.exceptions import InvalidSplitLevel
+
+from project.helpers import get_even_samples, is_data_valid, Data
 
 from tests.utils import *
 
@@ -62,20 +63,8 @@ class TestGetFramesFromVideo:
         frames = get_frames_from_video(TEST_MP4_PATH)
         assert len(frames) == 145
 
-    def test__when_called_with_path_not_pointing_to_file__raises_exception(self):
-        with pytest.raises(FileNotFoundError):
-            get_frames_from_video("definitely_wrong_file_path.truly_wrong")
-
 
 class TestSplitImageIntoTiles:
-    def test__when_called_with_incorrect_split_level__raises_exception(self):
-        with pytest.raises(InvalidSplitLevel, match="split level must be at least 1"):
-            split_image_into_tiles(TEST_JPG_PATH, 0)
-
-    def test__when_called_with_path_not_pointing_to_file__raises_exception(self):
-        with pytest.raises(FileNotFoundError):
-            split_image_into_tiles("definitely_wrong_file_path.truly_wrong", 1)
-
     @pytest.mark.parametrize(
         "split_level, expected_tile_dimensions", [(1, (2, 2)), (3, (8, 8))]
     )
@@ -103,3 +92,39 @@ class TestSplitInteger:
         splits = get_even_samples(to_split, split_degree)
 
         assert splits == expected_splits
+
+
+@pytest.mark.parametrize(
+    "invalid_data, expected_exception",
+    [
+        (
+            Data(
+                target_image_path="invalid_image_path",
+                source_video_path=TEST_MP4_PATH,
+                requested_split_level=1,
+            ),
+            FileNotFoundError,
+        ),
+        (
+            Data(
+                target_image_path=TEST_JPG_PATH,
+                source_video_path="invalid_video_path",
+                requested_split_level=1,
+            ),
+            FileNotFoundError,
+        ),
+        (
+            Data(
+                target_image_path=TEST_JPG_PATH,
+                source_video_path=TEST_MP4_PATH,
+                requested_split_level=0,
+            ),
+            InvalidSplitLevel,
+        ),
+    ],
+)
+def test__is_data_valid__invalid_property__raises_expected_exception(
+    invalid_data, expected_exception
+):
+    with pytest.raises(expected_exception=expected_exception):
+        is_data_valid(data=invalid_data)

@@ -11,8 +11,3 @@ def app():
 @pytest.fixture
 def client(app):
     return app.test_client()
-
-
-@pytest.fixture(autouse=True)
-def mock_storage(mocker):
-    return mocker.patch("main.storage")

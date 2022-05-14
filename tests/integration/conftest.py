@@ -14,11 +14,6 @@ def client(app):
 
 
 @pytest.fixture
-def mock_storage(mocker):
-    return mocker.patch("main.storage")
-
-
-@pytest.fixture
 def mock_file_check(mocker):
     return mocker.patch("main._file_is_valid", return_value=True)
 
