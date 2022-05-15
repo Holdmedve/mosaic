@@ -1,3 +1,4 @@
+import resource
 import uuid
 import cv2
 
@@ -49,4 +50,9 @@ if __name__ == "__main__":
     # http://flask.pocoo.org/docs/1.0/quickstart/#static-files. Once deployed,
     # App Engine itself will serve those files as configured in app.yaml.
     TEMP_CONTENT_PATH = "project/static"
+
+    soft_memory_limit_in_bytes = 200000000
+    soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+    resource.setrlimit(resource.RLIMIT_AS, (soft_memory_limit_in_bytes, hard))
+
     app.run(host="127.0.0.1", port=5000, debug=True)

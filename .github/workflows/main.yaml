@@ -24,6 +24,8 @@ jobs:
         run: make code-format
       - name: Run tests
         run: make test
+      - name: Run e2e tests
+        run: make test-e2e
       
   
   deploy:
