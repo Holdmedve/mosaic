@@ -12,12 +12,11 @@ mosavid
 
 tests/cypress/*
 !tests/cypress/integration
-!tests/cypress/cypress.json
 
-*.json
+/*.json
+
 *.prof
-
-./*.pyc
-./*.jpg
-./*.mp4
+*.pyc
+*.jpg
+*.mp4
 
