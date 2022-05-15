@@ -23,8 +23,13 @@ def root() -> str:
 
 @app.route("/create_mosaic", methods=["POST"])
 def create_mosaic() -> str:
+    soft_memory_limit_in_bytes = 200000000
+    soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+    resource.setrlimit(resource.RLIMIT_AS, (soft_memory_limit_in_bytes, hard))
+
     image = request.files["image"]
     video = request.files["video"]
+    
 
     image_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
     video_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
