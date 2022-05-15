@@ -1,10 +1,8 @@
 import math
 import os
-import cv2  # type: ignore
+import cv2
 
-from typing import List
 from numpy.typing import NDArray
-from numpy import ndarray
 
 
 import numpy as np

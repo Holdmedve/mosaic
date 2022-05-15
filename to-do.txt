@@ -1,7 +1,7 @@
 MUST:
 - memory limit reached on app engine
     profile mosaic creation logic, optimize
-    use snakeviz and tracemalloc
+    create test that uses tracemalloc, failes if exceeds limit
 - create test that runs after deploy
     run e2e test/endpoint directly
 - make quality tests for mosaic creation logic
@@ -11,7 +11,6 @@ MUST:
     dropdown of numbers
 - refactor mosavid logic
     magic numbers
-    dataclass for image, video, split level
 
 
 NICE_TO_HAVE:

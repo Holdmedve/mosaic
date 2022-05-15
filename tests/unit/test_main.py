@@ -1,5 +1,4 @@
 import os
-import pytest
 from io import BytesIO
 from typing import Any
 

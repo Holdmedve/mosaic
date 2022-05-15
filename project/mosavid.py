@@ -1,8 +1,6 @@
 import numpy as np
 
-from dataclasses import dataclass
 from numpy.typing import NDArray
-from numpy import ndarray, source
 from typing import Callable
 from project.distance import mean_color_euclidian_distance
 

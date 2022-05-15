@@ -1,5 +1,4 @@
 import pytest
-import random
 from main import app as flask_app
 from typing import Any
 

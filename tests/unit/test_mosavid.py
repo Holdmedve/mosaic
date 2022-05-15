@@ -1,15 +1,14 @@
-from plistlib import InvalidFileException
+from typing import Union
 import pytest
 import cv2
 import numpy as np
 
-from typing import Union
 from numpy.typing import NDArray
+from project.exceptions import InvalidSplitLevel
 
 from project.mosavid import (
     stitch_images_together,
 )
-from project.exceptions import InvalidSplitLevel
 
 from project.helpers import (
     get_even_samples,
@@ -110,27 +109,27 @@ def test__get_even_samples__when_called__returns_expected_splits(
             ),
             FileNotFoundError,
         ),
-        # (
-        #     MosaicData(
-        #         target_image_path=TEST_JPG_PATH,
-        #         source_video_path="invalid_video_path",
-        #         requested_tile_count=1,
-        #     ),
-        #     FileNotFoundError,
-        # ),
-        # (
-        #     MosaicData(
-        #         target_image_path=TEST_JPG_PATH,
-        #         source_video_path=TEST_MP4_PATH,
-        #         requested_tile_count=0,
-        #     ),
-        #     InvalidSplitLevel,
-        # ),
+        (
+            MosaicData(
+                target_image_path=TEST_JPG_PATH,
+                source_video_path="invalid_video_path",
+                requested_tile_count=1,
+            ),
+            FileNotFoundError,
+        ),
+        (
+            MosaicData(
+                target_image_path=TEST_JPG_PATH,
+                source_video_path=TEST_MP4_PATH,
+                requested_tile_count=0,
+            ),
+            InvalidSplitLevel,
+        ),
     ],
 )
 def test__is_data_valid__invalid_property__raises_expected_exception(
     invalid_data: MosaicData,
-    expected_exception: FileNotFoundError,
+    expected_exception: Union[FileNotFoundError, InvalidSplitLevel],
 ) -> None:
-    with pytest.raises(expected_exception) as e:
+    with pytest.raises(expected_exception) as e:  # type: ignore
         is_data_valid(data=invalid_data)

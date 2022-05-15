@@ -1,9 +1,7 @@
-import os
 import uuid
 import cv2
 
 from flask import Flask, render_template, request
-from werkzeug.utils import secure_filename
 from project import mosavid
 
 # from PIL import Image

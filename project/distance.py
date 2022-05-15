@@ -1,7 +1,6 @@
 import numpy as np
 
 from numpy.typing import NDArray
-from numpy import ndarray
 
 
 def mean_color_euclidian_distance(
