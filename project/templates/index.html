@@ -11,41 +11,11 @@
       <input type="file" id="video_input" name="video">
 
       <label for="tile_count_input">Select tile count:</label>
-      <input list="tile_count" name="tile_count_input" id="tile_count_input">
-
-      <datalist id="tile_count">
-        <option value=4>
-        <option value=9>
-        <option value=16>
-        <option value=25>
-        <option value=36>
-        <option value=49>
-        <option value=64>
-        <option value=81>
-        <option value=100>
-        <option value=121>
-        <option value=144>
-        <option value=169>
-        <option value=196>
-        <option value=225>
-        <option value=256>
-        <option value=289>
-        <option value=324>
-        <option value=361>
-        <option value=400>
-        <option value=441>
-        <option value=484>
-        <option value=529>
-        <option value=576>
-        <option value=625>
-        <option value=676>
-        <option value=729>
-        <option value=784>
-        <option value=841>
-        <option value=900>
-        <option value=961>
-        <option value=1024>
-      </datalist>
+      <select id="tile_count_input" name="tile_count">
+        {% for value in tile_count_values %}
+          <option value={{ value }}>{{ value }}</option>
+        {% endfor %}
+      </select>
 
       <button type="submit" id="submit_btn" action="/create_mosaic">Create mosaic</button>
 

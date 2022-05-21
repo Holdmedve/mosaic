@@ -18,14 +18,15 @@ TEMP_CONTENT_PATH = "/tmp"
 
 @app.route("/")
 def root() -> str:
-    return render_template("index.html")
+    squares = [x**2 for x in range(2, 64)]
+    return render_template("index.html", tile_count_values=squares)
 
 
 @app.route("/create_mosaic", methods=["POST"])
 def create_mosaic() -> Response:
     image = request.files["image"]
     video = request.files["video"]
-    tile_count = int(request.form["tile_count_input"])
+    tile_count = int(request.form.get("tile_count"))
 
     image_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
     video_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
