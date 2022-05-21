@@ -50,9 +50,7 @@ def get_frames_from_video(vid_path: str) -> list[NDArray[np.int32]]:
                 original_width=frame.shape[1],
                 desired_height=100,
             )
-            cv2.imwrite(filename=f"untouched_{uuid.uuid1()}.jpg", img=frame)
             frame = cv2.resize(src=frame, dsize=(desired_width, desired_height))
-            cv2.imwrite(filename=f"{uuid.uuid1()}.jpg", img=frame)
             frames.append(frame)
         else:
             break
