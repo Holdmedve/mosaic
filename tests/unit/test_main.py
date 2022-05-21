@@ -22,6 +22,7 @@ def test__create_mosaic__saves_video_and_image_from_request(
     data = {
         "video": (BytesIO(bytes()), "video"),
         "image": (BytesIO(bytes()), "image"),
+        "tile_count_input": "4",
     }
 
     client.post("/create_mosaic", data=data)

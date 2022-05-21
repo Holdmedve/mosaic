@@ -28,7 +28,13 @@ def test__split_into_tiles_and_stitcing_back_together__results_in_original_image
 
 
 def test_create_mosaic__when_called__executes_without_errors() -> None:
-    create_mosaic_from_video(TEST_JPG_PATH, TEST_MP4_PATH)
+    create_mosaic_from_video(
+        data=MosaicData(
+            target_image_path=TEST_JPG_PATH,
+            source_video_path=TEST_MP4_PATH,
+            requested_tile_count=4,
+        )
+    )
 
 
 def test_get_best_fitting_frames__executes_without_errors() -> None:

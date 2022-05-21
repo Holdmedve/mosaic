@@ -1,7 +1,7 @@
 MUST:
+- resize but keep ratio
 - memory limit reached on app engine
     profile mosaic creation logic, optimize
-    create test that uses tracemalloc, failes if exceeds limit
 - create test that runs after deploy
     run e2e test/endpoint directly
 - make quality tests for mosaic creation logic

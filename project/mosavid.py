@@ -70,14 +70,8 @@ def get_best_fitting_frames(
     return best_fitting_frames
 
 
-def create_mosaic_from_video(
-    target_img_path: str, source_video_path: str
-) -> NDArray[np.int32]:
-    data = MosaicData(
-        target_image_path=target_img_path,
-        source_video_path=source_video_path,
-        requested_tile_count=4,
-    )
+def create_mosaic_from_video(data: MosaicData) -> NDArray[np.int32]:
+
     if not is_data_valid(data):
         return np.array([])
 
