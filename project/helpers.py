@@ -1,5 +1,6 @@
 import math
 import os
+import uuid
 import cv2
 
 from numpy.typing import NDArray
@@ -44,12 +45,14 @@ def get_frames_from_video(vid_path: str) -> list[NDArray[np.int32]]:
     while True:
         success, frame = capture.read()
         if success:
-            desired_dimensions = _get_desired_dimensions_keep_ratio(
+            desired_width, desired_height = _get_desired_dimensions_keep_ratio(
                 original_height=frame.shape[0],
                 original_width=frame.shape[1],
                 desired_height=100,
             )
-            frame = cv2.resize(src=frame, dsize=desired_dimensions)
+            cv2.imwrite(filename=f"untouched_{uuid.uuid1()}.jpg", img=frame)
+            frame = cv2.resize(src=frame, dsize=(desired_width, desired_height))
+            cv2.imwrite(filename=f"{uuid.uuid1()}.jpg", img=frame)
             frames.append(frame)
         else:
             break
@@ -64,7 +67,7 @@ def _get_desired_dimensions_keep_ratio(
 ) -> tuple[int, int]:
     dimension_multiplier = desired_height / original_height
     desired_width = int(original_width * dimension_multiplier)
-    return (desired_height, desired_width)
+    return desired_width, desired_height
 
 
 def is_data_valid(data: MosaicData) -> bool:
