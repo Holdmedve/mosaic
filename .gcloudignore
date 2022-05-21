@@ -39,8 +39,11 @@ mosavid
 tests/cypress/*
 !tests/cypress/integration
 
-*.json
+/*.json
 
-./*.pyc
-./*.jpg
-./*.mp4
+*.prof
+*.pyc
+*.jpg
+*.mp4
+
+

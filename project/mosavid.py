@@ -76,7 +76,7 @@ def create_mosaic_from_video(
     data = MosaicData(
         target_image_path=target_img_path,
         source_video_path=source_video_path,
-        requested_tile_count=2,
+        requested_tile_count=4,
     )
     if not is_data_valid(data):
         return np.array([])

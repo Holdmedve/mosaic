@@ -44,6 +44,8 @@ def get_frames_from_video(vid_path: str) -> list[NDArray[np.int32]]:
     while True:
         success, frame = capture.read()
         if success:
+            frame = cv2.resize(src=frame, dsize=(100, 100))
+
             frames.append(frame)
         else:
             break

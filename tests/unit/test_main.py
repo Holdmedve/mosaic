@@ -46,12 +46,6 @@ def test__root__response_contains_form_with_right_attributes(client: Any) -> Non
     )
 
 
-def test__root__translates_url_for_static_folder(client: Any) -> None:
-    response = client.get("/")
-
-    assert b'img src="/static/"' in response.data
-
-
 def delete_all_files_in_directory(directory_path: str) -> None:
     for path in os.listdir(directory_path):
         full_path = os.path.join(directory_path, path)

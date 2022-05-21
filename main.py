@@ -1,8 +1,7 @@
-import resource
 import uuid
 import cv2
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory, Response
 from project import mosavid
 
 # from PIL import Image
@@ -22,14 +21,9 @@ def root() -> str:
 
 
 @app.route("/create_mosaic", methods=["POST"])
-def create_mosaic() -> str:
-    soft_memory_limit_in_bytes = 200000000
-    soft, hard = resource.getrlimit(resource.RLIMIT_AS)
-    resource.setrlimit(resource.RLIMIT_AS, (soft_memory_limit_in_bytes, hard))
-
+def create_mosaic() -> Response:
     image = request.files["image"]
     video = request.files["video"]
-    
 
     image_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
     video_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
@@ -43,7 +37,9 @@ def create_mosaic() -> str:
     mosaic_file_path = f"{TEMP_CONTENT_PATH}/{mosaic_file_name}"
     cv2.imwrite(filename=mosaic_file_path, img=mosaic)
 
-    return render_template("index.html", mosaic=mosaic_file_name)
+    # return render_template("index.html", mosaic=mosaic_file_name)
+    return send_from_directory(directory=TEMP_CONTENT_PATH, path=mosaic_file_name)
+    # return send_from_directory(driectory='', filename=mosaic_file_name)
 
 
 if __name__ == "__main__":
@@ -55,9 +51,4 @@ if __name__ == "__main__":
     # http://flask.pocoo.org/docs/1.0/quickstart/#static-files. Once deployed,
     # App Engine itself will serve those files as configured in app.yaml.
     TEMP_CONTENT_PATH = "project/static"
-
-    soft_memory_limit_in_bytes = 200000000
-    soft, hard = resource.getrlimit(resource.RLIMIT_AS)
-    resource.setrlimit(resource.RLIMIT_AS, (soft_memory_limit_in_bytes, hard))
-
     app.run(host="127.0.0.1", port=5000, debug=True)
