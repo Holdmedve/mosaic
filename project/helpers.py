@@ -44,8 +44,12 @@ def get_frames_from_video(vid_path: str) -> list[NDArray[np.int32]]:
     while True:
         success, frame = capture.read()
         if success:
-            frame = cv2.resize(src=frame, dsize=(100, 100))
-
+            desired_dimensions = _get_desired_dimensions_keep_ratio(
+                original_height=frame.shape[0],
+                original_width=frame.shape[1],
+                desired_height=100,
+            )
+            frame = cv2.resize(src=frame, dsize=desired_dimensions)
             frames.append(frame)
         else:
             break
@@ -53,6 +57,14 @@ def get_frames_from_video(vid_path: str) -> list[NDArray[np.int32]]:
     capture.release()
 
     return frames
+
+
+def _get_desired_dimensions_keep_ratio(
+    original_height: int, original_width: int, desired_height: int
+) -> tuple[int, int]:
+    dimension_multiplier = desired_height / original_height
+    desired_width = int(original_width * dimension_multiplier)
+    return (desired_height, desired_width)
 
 
 def is_data_valid(data: MosaicData) -> bool:
