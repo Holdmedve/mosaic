@@ -26,7 +26,7 @@ def root() -> str:
 def create_mosaic() -> Response:
     image = request.files["image"]
     video = request.files["video"]
-    tile_count = int(request.form.get("tile_count"))
+    tile_count = int(str(request.form.get("tile_count")))
 
     image_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
     video_path = f"{TEMP_CONTENT_PATH}/{uuid.uuid1()}"
