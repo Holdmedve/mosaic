@@ -3,6 +3,8 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Callable
 from project.distance import mean_color_euclidian_distance
+from memory_profiler import profile
+
 
 from project.helpers import (
     get_frames_from_video,
@@ -70,6 +72,7 @@ def get_best_fitting_frames(
     return best_fitting_frames
 
 
+@profile
 def create_mosaic_from_video(data: MosaicData) -> NDArray[np.int32]:
 
     if not is_data_valid(data):

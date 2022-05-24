@@ -10,3 +10,4 @@ google-cloud-storage==2.3.0
 pillow==9.1.0
 snakeviz==2.1.1
 autoflake==1.4
+memory-profiler==0.60.0
