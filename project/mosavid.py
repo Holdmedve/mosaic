@@ -72,7 +72,7 @@ def get_best_fitting_frames(
     return best_fitting_frames
 
 
-@profile
+@profile  # type:ignore
 def create_mosaic_from_video(data: MosaicData) -> NDArray[np.int32]:
 
     if not is_data_valid(data):

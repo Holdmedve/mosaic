@@ -1,6 +1,5 @@
 import math
 import os
-import uuid
 import cv2
 
 from numpy.typing import NDArray
