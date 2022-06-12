@@ -4,6 +4,7 @@ MUST:
     - select fixed number of frames from video
     https://stackoverflow.com/questions/33523751/getting-specific-frames-from-videocapture-opencv-in-python
     sample(range(10000000), k=60)
+	- every 100 frames do the comparison to not exceed memory limit
 
     profile mosaic creation logic, optimize
 
