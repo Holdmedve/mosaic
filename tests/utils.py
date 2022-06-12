@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from numpy.typing import NDArray
+from project.types import Image
 
 TEST_MP4_PATH = "tests/data/test_video.mp4"
 TEST_JPG_PATH = "tests/data/pic1.jpg"
@@ -8,8 +8,8 @@ TEST_JPG_PATH = "tests/data/pic1.jpg"
 BLACK_PIXEL = [0, 0, 0]
 WHITE_PIXEL = [255, 255, 255]
 
-BLACK_IMG: NDArray[np.int32] = np.array([[BLACK_PIXEL]], dtype=np.int32)
-WHITE_IMG: NDArray[np.int32] = np.array([[WHITE_PIXEL]], dtype=np.int32)
+BLACK_IMG: Image = np.array([[BLACK_PIXEL]], dtype=np.int32)
+WHITE_IMG: Image = np.array([[WHITE_PIXEL]], dtype=np.int32)
 
 
 def black_img() -> cv2.Mat:

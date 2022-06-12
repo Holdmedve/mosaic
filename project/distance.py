@@ -1,11 +1,9 @@
 import numpy as np
 
-from numpy.typing import NDArray
+from project.types import Image
 
 
-def mean_color_euclidian_distance(
-    img_a: NDArray[np.int32], img_b: NDArray[np.int32]
-) -> float:
+def mean_color_euclidian_distance(img_a: Image, img_b: Image) -> float:
     mean_a = img_a.mean(axis=(0, 1))
     mean_b = img_b.mean(axis=(0, 1))
 

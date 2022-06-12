@@ -3,7 +3,6 @@ import pytest
 import cv2
 import numpy as np
 
-from numpy.typing import NDArray
 from project.exceptions import InvalidSplitLevel
 
 from project.mosavid import (
@@ -17,6 +16,7 @@ from project.helpers import (
     split_image_into_tiles,
 )
 from project.mosaic_data import MosaicData
+from project.types import Image
 from project.distance import mean_color_euclidian_distance
 from tests.utils import *
 
@@ -26,7 +26,7 @@ def test__stitch_tiles__when_called_with_4_pixels_as_tiles__returns_them_as_1_ar
         [black_img(), white_img()],
         [white_img(), black_img()],
     ]
-    expected_image: NDArray[np.int32] = np.array(
+    expected_image: Image = np.array(
         [[BLACK_PIXEL, WHITE_PIXEL], [WHITE_PIXEL, BLACK_PIXEL]]
     )
 
