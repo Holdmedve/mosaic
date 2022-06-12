@@ -1,0 +1,2 @@
+memory-profiler==0.60.0
+snakeviz==2.1.1
