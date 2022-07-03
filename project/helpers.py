@@ -36,13 +36,14 @@ def split_image_into_tiles(data: MosaicData) -> list[list[Image]]:
     return tiles
 
 
-def get_frames_from_video(vid_path: str) -> list[Image]:
+def get_n_frames_from_kth_frame(vid_path: str, n: int, k: int) -> list[Image]:
     capture = cv2.VideoCapture(vid_path)
+    capture.set(cv2.CAP_PROP_POS_FRAMES, k)
     frames = []
 
     while True:
         success, frame = capture.read()
-        if success:
+        if len(frames) < n and success:
             desired_width, desired_height = _get_desired_dimensions_keep_ratio(
                 original_height=frame.shape[0],
                 original_width=frame.shape[1],

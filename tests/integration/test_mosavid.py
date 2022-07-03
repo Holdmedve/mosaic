@@ -47,7 +47,7 @@ def test__find_best_fitting_frame__returns_frame_most_similar_to_tile() -> None:
     tile = black_img()
     frames = [white_img(), black_img(), white_img()]
 
-    best_fit = find_best_fitting_frame(
+    best_fit, _ = find_best_fitting_frame(
         tile=tile, frames=frames, comparison_fn=mean_color_euclidian_distance
     )
 
@@ -58,8 +58,10 @@ def test__find_best_fitting_frame__when_called_with_equally_similar_frames__retu
     tile = black_img()
     frames = [green_img(), blue_img(), red_img()]
 
-    best_fit = find_best_fitting_frame(
+    best_fit, _ = find_best_fitting_frame(
         tile=tile, frames=frames, comparison_fn=mean_color_euclidian_distance
     )
 
     assert (best_fit == frames[0]).all()
+
+

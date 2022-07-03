@@ -12,7 +12,7 @@ from project.mosavid import (
 from project.helpers import (
     get_even_samples,
     is_data_valid,
-    get_frames_from_video,
+    get_n_frames_from_kth_frame,
     split_image_into_tiles,
 )
 from project.mosaic_data import MosaicData
@@ -60,9 +60,25 @@ def test__mean_color_euclidian_distance__order_of_inputs_does_not_influence_resu
     assert result_1 == result_2
 
 
-def test__get_frames_from_video__when_called_with_test_mp4__returns_right_number_of_frames() -> None:
-    frames = get_frames_from_video(TEST_MP4_PATH)
-    assert len(frames) == 145
+def test__get_n_frames_from_kth_frame_from_video__returns_specified_number_of_frames() -> None:
+    expected_number_of_frames = 10
+
+    frames = get_n_frames_from_kth_frame(TEST_MP4_PATH, n=expected_number_of_frames, k=0)
+
+    assert len(frames) == expected_number_of_frames
+
+def test__get_n_frames_from_kth_frame_from_video__n_exceeds_total_frames__returns_total_number_of_frames() -> None:
+    capture = cv2.VideoCapture(TEST_MP4_PATH)
+    total_frames = capture.get(cv2.CAP_PROP_FRAME_COUNT)
+
+    frames = get_n_frames_from_kth_frame(TEST_MP4_PATH, n=9000, k=0)
+
+    assert len(frames) == total_frames
+
+def test__get_n_frames_from_kth_frame_from_video__k_exceeds_total_frames__returns_empty_list() -> None:
+    frames = get_n_frames_from_kth_frame(TEST_MP4_PATH, n=9000, k=666)
+
+    assert frames == []
 
 
 @pytest.mark.parametrize(

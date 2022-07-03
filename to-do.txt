@@ -1,12 +1,6 @@
 MUST:
 
 - memory limit reached on app engine
-    - select fixed number of frames from video
-    https://stackoverflow.com/questions/33523751/getting-specific-frames-from-videocapture-opencv-in-python
-    sample(range(10000000), k=60)
-	- every 100 frames do the comparison to not exceed memory limit
-
-    profile mosaic creation logic, optimize
 
     get_best_fitting_frames and find_best_fitting_frame
         could return indeces instead of images
@@ -18,6 +12,10 @@ MUST:
     make a test with them
 - refactor mosavid logic
     magic numbers
+- refactor tests
+    some are in the wrong module
+    write test for long video, or somehow check that
+        the video is processed in chunks
 
 
 NICE_TO_HAVE:

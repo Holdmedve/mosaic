@@ -1,4 +1,7 @@
+from cmath import sqrt
+import math
 import numpy as np
+import cv2
 
 from typing import Callable
 from project.distance import mean_color_euclidian_distance
@@ -6,7 +9,7 @@ from project.types import Image
 
 
 from project.helpers import (
-    get_frames_from_video,
+    get_n_frames_from_kth_frame,
     is_data_valid,
     split_image_into_tiles,
 )
@@ -35,7 +38,7 @@ def find_best_fitting_frame(
     frames: list[Image],
     tile: Image,
     comparison_fn: Callable[[Image, Image], float],
-) -> Image:
+) -> tuple[Image, float]:
     best_fit: Image = frames[0]
     best_dst: float = float("inf")
 
@@ -45,46 +48,83 @@ def find_best_fitting_frame(
             best_fit = f
             best_dst = dst
 
-    return best_fit
+    return best_fit, best_dst
 
 
 def get_best_fitting_frames(
     target_tiles: list[list[Image]],
     frames: list[Image],
     comparison_fn: Callable[[Image, Image], float],
-) -> list[list[Image]]:
+) -> tuple[list[list[Image]], list[float]]:
     best_fitting_frames: list[list[Image]]
+    best_distances: list[float]
 
     for x in range(len(target_tiles)):
-        row: list[Image]
+        row_of_frames: list[Image]
+        distances: list[float]
         for y in range(len(target_tiles[0])):
-            f = find_best_fitting_frame(frames, target_tiles[x][y], comparison_fn)
+            frame, distance = find_best_fitting_frame(frames, target_tiles[x][y], comparison_fn)
             if y == 0:
-                row = [f]
+                row_of_frames = [frame]
+                distances = [distance]
             else:
-                row.append(f)
+                row_of_frames.append(frame)
+                distances.append(distance)
         if x == 0:
-            best_fitting_frames = [row]
+            best_fitting_frames = [row_of_frames]
+            best_distances = distances
         else:
-            best_fitting_frames.append(row)
+            best_fitting_frames.append(row_of_frames)
+            best_distances.extend(distances)
 
-    return best_fitting_frames
+    return best_fitting_frames, best_distances
 
 
 def create_mosaic_from_video(data: MosaicData) -> Image:
-
     if not is_data_valid(data):
         return np.array([])
 
     target_tiles: list[list[Image]] = split_image_into_tiles(data)
-    frames: list[Image] = get_frames_from_video(data.source_video_path)
 
-    best_fitting_frames: list[list[Image]] = get_best_fitting_frames(
-        target_tiles=target_tiles,
-        frames=frames,
-        comparison_fn=mean_color_euclidian_distance,
-    )
+    mosaic_pieces: list[list[Image]] = None
+    total_num_frames: int = _get_total_num_frames(data.source_video_path)
+    num_frames_processed: int = 0
+    num_frames_to_process_per_iteration = 100
+    best_tile_distances = [float('inf')] * data.requested_tile_count
 
-    result: Image = stitch_images_together(best_fitting_frames)
+    while num_frames_processed < total_num_frames:
+        frames: list[Image] = get_n_frames_from_kth_frame(data.source_video_path, n=num_frames_to_process_per_iteration, k=num_frames_processed)
+        num_frames_processed += num_frames_to_process_per_iteration
+
+        best_fitting_frames, frame_tile_distances = get_best_fitting_frames(
+            target_tiles=target_tiles,
+            frames=frames,
+            comparison_fn=mean_color_euclidian_distance,
+        )
+        
+
+        if mosaic_pieces == None:
+            mosaic_pieces = best_fitting_frames
+            continue
+
+        print(f'frame_tile_distances: {frame_tile_distances}')
+        print(f'{len(mosaic_pieces)}, {len(mosaic_pieces[0])}')
+        print(f'{len(best_fitting_frames)}, {len(best_fitting_frames[0])}')
+
+        for idx, best_dist in enumerate(best_tile_distances):
+            if frame_tile_distances[idx] < best_dist:
+                best_tile_distances[idx] = frame_tile_distances[idx]
+                a = int(math.sqrt(data.requested_tile_count))
+                row =  idx // a if idx != 0 else 0
+                col = idx % a if idx != 0 else 0
+                print('row, col', row, col)
+                mosaic_pieces[row][col] = best_fitting_frames[row][col]
+
+
+    result: Image = stitch_images_together(mosaic_pieces)
 
     return result
+
+def _get_total_num_frames(video_path: str):
+    capture = cv2.VideoCapture(video_path)
+    return capture.get(cv2.CAP_PROP_FRAME_COUNT)

@@ -44,9 +44,7 @@ def create_mosaic() -> Response:
     mosaic_file_path = f"{TEMP_CONTENT_PATH}/{mosaic_file_name}"
     cv2.imwrite(filename=mosaic_file_path, img=mosaic)
 
-    # return render_template("index.html", mosaic=mosaic_file_name)
     return send_from_directory(directory=TEMP_CONTENT_PATH, path=mosaic_file_name)
-    # return send_from_directory(driectory='', filename=mosaic_file_name)
 
 
 if __name__ == "__main__":
