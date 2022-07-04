@@ -39,7 +39,7 @@ def split_image_into_tiles(data: MosaicData) -> list[list[Image]]:
 def get_n_frames_from_kth_frame(vid_path: str, n: int, k: int) -> list[Image]:
     capture = cv2.VideoCapture(vid_path)
     capture.set(cv2.CAP_PROP_POS_FRAMES, k)
-    frames = []
+    frames: list[Image] = []
 
     while True:
         success, frame = capture.read()

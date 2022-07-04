@@ -1,4 +1,3 @@
-from cmath import sqrt
 import math
 import numpy as np
 import cv2
@@ -63,7 +62,9 @@ def get_best_fitting_frames(
         row_of_frames: list[Image]
         distances: list[float]
         for y in range(len(target_tiles[0])):
-            frame, distance = find_best_fitting_frame(frames, target_tiles[x][y], comparison_fn)
+            frame, distance = find_best_fitting_frame(
+                frames, target_tiles[x][y], comparison_fn
+            )
             if y == 0:
                 row_of_frames = [frame]
                 distances = [distance]
@@ -86,45 +87,45 @@ def create_mosaic_from_video(data: MosaicData) -> Image:
 
     target_tiles: list[list[Image]] = split_image_into_tiles(data)
 
-    mosaic_pieces: list[list[Image]] = None
+    mosaic_pieces: list[list[Image]] = list(list([]))
     total_num_frames: int = _get_total_num_frames(data.source_video_path)
     num_frames_processed: int = 0
     num_frames_to_process_per_iteration = 100
-    best_tile_distances = [float('inf')] * data.requested_tile_count
+    best_tile_distances = [float("inf")] * data.requested_tile_count
 
     while num_frames_processed < total_num_frames:
-        frames: list[Image] = get_n_frames_from_kth_frame(data.source_video_path, n=num_frames_to_process_per_iteration, k=num_frames_processed)
-        num_frames_processed += num_frames_to_process_per_iteration
+        frames: list[Image] = get_n_frames_from_kth_frame(
+            data.source_video_path,
+            n=num_frames_to_process_per_iteration,
+            k=num_frames_processed,
+        )
 
         best_fitting_frames, frame_tile_distances = get_best_fitting_frames(
             target_tiles=target_tiles,
             frames=frames,
             comparison_fn=mean_color_euclidian_distance,
         )
-        
 
-        if mosaic_pieces == None:
+        if num_frames_processed == 0:
             mosaic_pieces = best_fitting_frames
+            num_frames_processed += num_frames_to_process_per_iteration
             continue
 
-        print(f'frame_tile_distances: {frame_tile_distances}')
-        print(f'{len(mosaic_pieces)}, {len(mosaic_pieces[0])}')
-        print(f'{len(best_fitting_frames)}, {len(best_fitting_frames[0])}')
+        num_frames_processed += num_frames_to_process_per_iteration
 
         for idx, best_dist in enumerate(best_tile_distances):
             if frame_tile_distances[idx] < best_dist:
                 best_tile_distances[idx] = frame_tile_distances[idx]
                 a = int(math.sqrt(data.requested_tile_count))
-                row =  idx // a if idx != 0 else 0
+                row = idx // a if idx != 0 else 0
                 col = idx % a if idx != 0 else 0
-                print('row, col', row, col)
                 mosaic_pieces[row][col] = best_fitting_frames[row][col]
-
 
     result: Image = stitch_images_together(mosaic_pieces)
 
     return result
 
-def _get_total_num_frames(video_path: str):
+
+def _get_total_num_frames(video_path: str) -> int:
     capture = cv2.VideoCapture(video_path)
-    return capture.get(cv2.CAP_PROP_FRAME_COUNT)
+    return capture.get(cv2.CAP_PROP_FRAME_COUNT)  # type: ignore

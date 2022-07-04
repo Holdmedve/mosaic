@@ -63,5 +63,3 @@ def test__find_best_fitting_frame__when_called_with_equally_similar_frames__retu
     )
 
     assert (best_fit == frames[0]).all()
-
-

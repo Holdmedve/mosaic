@@ -63,9 +63,12 @@ def test__mean_color_euclidian_distance__order_of_inputs_does_not_influence_resu
 def test__get_n_frames_from_kth_frame_from_video__returns_specified_number_of_frames() -> None:
     expected_number_of_frames = 10
 
-    frames = get_n_frames_from_kth_frame(TEST_MP4_PATH, n=expected_number_of_frames, k=0)
+    frames = get_n_frames_from_kth_frame(
+        TEST_MP4_PATH, n=expected_number_of_frames, k=0
+    )
 
     assert len(frames) == expected_number_of_frames
+
 
 def test__get_n_frames_from_kth_frame_from_video__n_exceeds_total_frames__returns_total_number_of_frames() -> None:
     capture = cv2.VideoCapture(TEST_MP4_PATH)
@@ -74,6 +77,7 @@ def test__get_n_frames_from_kth_frame_from_video__n_exceeds_total_frames__return
     frames = get_n_frames_from_kth_frame(TEST_MP4_PATH, n=9000, k=0)
 
     assert len(frames) == total_frames
+
 
 def test__get_n_frames_from_kth_frame_from_video__k_exceeds_total_frames__returns_empty_list() -> None:
     frames = get_n_frames_from_kth_frame(TEST_MP4_PATH, n=9000, k=666)
