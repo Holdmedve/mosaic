@@ -90,7 +90,7 @@ def create_mosaic_from_video(data: MosaicData) -> Image:
     mosaic_pieces: list[list[Image]] = list(list([]))
     total_num_frames: int = _get_total_num_frames(data.source_video_path)
     num_frames_processed: int = 0
-    num_frames_to_process_per_iteration = 100
+    num_frames_to_process_per_iteration = 1000
     best_tile_distances = [float("inf")] * data.requested_tile_count
 
     while num_frames_processed < total_num_frames:
