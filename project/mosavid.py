@@ -88,12 +88,12 @@ def create_mosaic_from_video(data: MosaicData) -> Image:
     target_tiles: list[list[Image]] = split_image_into_tiles(data)
 
     mosaic_pieces: list[list[Image]] = list(list([]))
-    total_num_frames: int = _get_total_num_frames(data.source_video_path)
+    num_total_frames: int = _get_total_num_frames(data.source_video_path)
     num_frames_processed: int = 0
     num_frames_to_process_per_iteration = 100
     best_tile_distances = [float("inf")] * data.requested_tile_count
 
-    while num_frames_processed < total_num_frames:
+    while num_frames_processed < num_total_frames:
         frames: list[Image] = get_n_frames_from_kth_frame(
             data.source_video_path,
             n=num_frames_to_process_per_iteration,
@@ -108,22 +108,43 @@ def create_mosaic_from_video(data: MosaicData) -> Image:
 
         if num_frames_processed == 0:
             mosaic_pieces = best_fitting_frames
-            num_frames_processed += num_frames_to_process_per_iteration
-            continue
+        else:
+            mosaic_pieces = _get_best_fitting_mosaic_pieces(
+                mosaic_pieces=mosaic_pieces,
+                best_tile_distances=best_tile_distances,
+                frames=frames,
+                frame_tile_distances=frame_tile_distances,
+                requested_tile_count=data.requested_tile_count,
+            )
 
         num_frames_processed += num_frames_to_process_per_iteration
-
-        for idx, best_dist in enumerate(best_tile_distances):
-            if frame_tile_distances[idx] < best_dist:
-                best_tile_distances[idx] = frame_tile_distances[idx]
-                a = int(math.sqrt(data.requested_tile_count))
-                row = idx // a if idx != 0 else 0
-                col = idx % a if idx != 0 else 0
-                mosaic_pieces[row][col] = best_fitting_frames[row][col]
 
     result: Image = stitch_images_together(mosaic_pieces)
 
     return result
+
+
+def _get_best_fitting_mosaic_pieces(
+    mosaic_pieces: list[list[Image]],
+    best_tile_distances: list[float],
+    frames: list[Image],
+    frame_tile_distances: list[float],
+    requested_tile_count: int,
+) -> list[list[Image]]:
+
+    for idx, best_dist in enumerate(best_tile_distances):
+        if frame_tile_distances[idx] < best_dist:
+            best_tile_distances[idx] = frame_tile_distances[idx]
+            a = _sqrti(requested_tile_count)
+            row = idx // a if idx != 0 else 0
+            col = idx % a if idx != 0 else 0
+            mosaic_pieces[row][col] = frames[row][col]
+
+    return mosaic_pieces
+
+
+def _sqrti(a: int) -> int:
+    return int(math.sqrt(a))
 
 
 def _get_total_num_frames(video_path: str) -> int:

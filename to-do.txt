@@ -1,5 +1,7 @@
 MUST:
 
+- refactor mosavid
+    - horrible names, functions, types  
 - memory limit reached on app engine
 
     get_best_fitting_frames and find_best_fitting_frame
