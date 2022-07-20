@@ -17,7 +17,7 @@ def test__create_mosaic__send_request__does_not_throw_exception(client: Any) -> 
 def test__create_mosaic__saves_video_and_image_from_request(
     client: Any, mocker: Any
 ) -> None:
-    mocker.patch("main.mosavid.create_mosaic_from_video")
+    mocker.patch("main.mosavid.generate_mosaic")
     delete_all_files_in_directory(TEMP_CONTENT_PATH)
     data = {
         "video": (BytesIO(bytes()), "video"),

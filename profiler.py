@@ -1,5 +1,5 @@
 from project.mosavid import create_mosaic_from_video
-from tests.utils import TEST_JPG_PATH, TEST_MP4_PATH
+from tests.utils import TEST_IMAGE_PATH, TEST_VIDEO_PATH
 from project.mosaic_data import MosaicData
 
 

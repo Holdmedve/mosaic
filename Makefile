@@ -22,7 +22,7 @@ run-shell:
 code-format:
 	docker-compose run test "autoflake --in-place --remove-all-unused-imports --remove-unused-variables -r tests project main.py"
 	docker-compose run test "black ."
-	docker-compose run test "mypy --strict ."
+	docker-compose run test "mypy ."
 
 stop:
 	docker stop foobar

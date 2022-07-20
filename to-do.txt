@@ -1,5 +1,5 @@
 MUST:
-
+- look through code with singe responsibility, level of abstraction in mind
 - refactor mosavid
     - horrible names, functions, types  
 - memory limit reached on app engine

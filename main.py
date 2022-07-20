@@ -3,7 +3,7 @@ import cv2
 
 from flask import Flask, render_template, request, send_from_directory, Response
 from project import mosavid
-from project.mosaic_data import MosaicData
+from project.types import Config
 
 # from PIL import Image
 
@@ -33,11 +33,11 @@ def create_mosaic() -> Response:
     image.save(image_path)
     video.save(video_path)
 
-    mosaic = mosavid.create_mosaic_from_video(
-        data=MosaicData(
-            target_image_path=image_path,
-            source_video_path=video_path,
-            requested_tile_count=tile_count,
+    mosaic = mosavid.generate_mosaic(
+        config=Config(
+            original_image_path=image_path,
+            video_path=video_path,
+            mosaic_tile_count=tile_count,
         )
     )
     mosaic_file_name = f"{uuid.uuid1()}.png"

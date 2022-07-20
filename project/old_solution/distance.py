@@ -1,6 +1,6 @@
 import numpy as np
 
-from project.types import Image
+from project.types import Image, Image
 
 
 def mean_color_euclidian_distance(img_a: Image, img_b: Image) -> float:
