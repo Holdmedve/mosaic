@@ -49,19 +49,13 @@ def get_best_matching_frames(
     frame_indeces: tuple[int, ...], tiles: list[NDArray[np.uint8]], video_path: str
 ) -> list[NDArray[np.uint8]]:
     # multiprocess / thread here?
-    num_frames = len(frame_indeces)
-    batch_size = 100
     best_matching_frames = []
+    frames = get_frames_at_indeces(video_path=video_path, indeces=frame_indeces)
 
-    for i in range(0, min(num_frames, batch_size), num_frames):
-        batch_of_frame_indeces = frame_indeces[i : i + batch_size]
-        batch_of_frames = get_frames_at_indeces(
-            video_path=video_path, indeces=batch_of_frame_indeces
+    for tile in tiles:
+        best_matching_frames.append(
+            get_best_matching_frame_for_tile(frames=frames, tile=tile)
         )
-        for tile in tiles:
-            best_matching_frames.append(
-                get_best_matching_frame_for_tile(batch_of_frames, tile)
-            )
 
     return best_matching_frames
 

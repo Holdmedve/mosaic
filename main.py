@@ -18,7 +18,7 @@ TEMP_CONTENT_PATH = "/tmp"
 
 @app.route("/")
 def root() -> str:
-    squares = [x**2 for x in range(2, 64)]
+    squares = [x**2 for x in range(32, 64)]
     return render_template("index.html", tile_count_values=squares)
 
 
