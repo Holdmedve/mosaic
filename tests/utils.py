@@ -3,7 +3,7 @@ import numpy as np
 from project.types import Image
 
 TEST_VIDEO_PATH = "tests/data/test_video.mp4"
-TEST_IMAGE_PATH = "tests/data/pic1.jpg"
+TEST_IMAGE_PATH = "tests/data/picture.jpg"
 
 BLACK_PIXEL = [0, 0, 0]
 WHITE_PIXEL = [255, 255, 255]

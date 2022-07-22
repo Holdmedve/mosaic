@@ -37,7 +37,9 @@ def get_best_matches_for_tiles(
 
     num_frames_to_match = min(num_total_frames, max_frames_to_match)
     frame_indeces = get_random_non_negative_integers(
-        range_max=num_total_frames, num_integers=num_frames_to_match, duplicates_allowed=False
+        range_max=num_total_frames,
+        num_integers=num_frames_to_match,
+        duplicates_allowed=False,
     )
 
     return get_best_matching_frames(frame_indeces, tiles, video_path)
