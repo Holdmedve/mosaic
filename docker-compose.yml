@@ -14,9 +14,3 @@ services:
       - ./mypy.ini:/home/app/mypy.ini
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/home/app/key.json
-  shell:
-    build:
-      context: .
-      dockerfile: ./Dockerfile.mkdir
-    entrypoint: /bin/sh
-    working_dir: /
