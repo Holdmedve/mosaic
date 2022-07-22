@@ -10,4 +10,5 @@ Image = NDArray[np.uint8]
 class Config:
     original_image_path: str
     video_path: str
+    max_frames_to_match: int
     mosaic_tile_count: int
