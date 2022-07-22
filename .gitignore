@@ -13,6 +13,7 @@ mosavid
 tests/cypress/*
 !tests/cypress/integration
 
+
 project/static/*
 !project/static/script.js
 !project/static/style.css
@@ -22,5 +23,6 @@ project/static/*
 *.prof
 *.pyc
 *.jpg
+!tests/data/picture.jpg
 *.mp4
 
