@@ -38,7 +38,7 @@ def create_mosaic() -> Response:
             original_image_path=image_path,
             video_path=video_path,
             mosaic_tile_count=tile_count,
-            max_frames_to_match=1000,
+            max_frames_to_match=256,
         )
     )
     mosaic_file_name = f"{uuid.uuid1()}.jpg"
