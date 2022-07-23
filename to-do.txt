@@ -1,23 +1,18 @@
 MUST:
+- find places to replace for loops with numpy operations
+    - stitch_images_together
+    - get_best_matching_frame_for_tile
+        when looking for max similarity, also store the index
+        avoid looping twice, but PROFILE to make sure this helps at all
+    - mean_color_similarities
+        sqrt szamolas lehetne np operation
 - look through code with singe responsibility, level of abstraction in mind
-- refactor mosavid
-    - horrible names, functions, types  
-- memory limit reached on app engine
 
-    get_best_fitting_frames and find_best_fitting_frame
-        could return indeces instead of images
 
 - create test that runs after deploy
     run e2e test/endpoint directly
-- make quality tests for mosaic creation logic
-    collect an image-video pair that produces nice result
-    make a test with them
-- refactor mosavid logic
-    magic numbers
-- refactor tests
-    some are in the wrong module
-    write test for long video, or somehow check that
-        the video is processed in chunks
+    test with highest tile count setting
+        maybe measure time as well as an assertion for the test
 
 
 NICE_TO_HAVE:
@@ -28,9 +23,6 @@ NICE_TO_HAVE:
     let the user know something is happening
 - error message for too big files
     filter request files based on size
-- being able to reach the container through browser
-    container runs locally with flask
-    reach it from browser
-    not easily possible using windows
+
 
 

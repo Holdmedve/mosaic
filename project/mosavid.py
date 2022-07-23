@@ -8,10 +8,13 @@ from project.helpers import (
     get_random_non_negative_integers,
     reshape_flat_list_to_nested,
 )
-from project.image import split_image_into_tiles, stitch_grid_of_images_together
-from project.similarity import mean_color_similarity
+from project.image import (
+    split_image_into_tiles,
+    stitch_grid_of_images_together,
+)
+from project.similarity import mean_color_similarities
 from project.types import Config
-from project.video import get_frames_at_indeces
+from project.video import get_resized_frames_at_indeces
 
 
 def generate_mosaic(config: Config) -> NDArray[np.uint8]:
@@ -48,9 +51,14 @@ def get_best_matches_for_tiles(
 def get_best_matching_frames(
     frame_indeces: tuple[int, ...], tiles: list[NDArray[np.uint8]], video_path: str
 ) -> list[NDArray[np.uint8]]:
-    # multiprocess / thread here?
     best_matching_frames = []
-    frames = get_frames_at_indeces(video_path=video_path, indeces=frame_indeces)
+    height = 100
+    frames = get_resized_frames_at_indeces(
+        video_path=video_path,
+        indeces=frame_indeces,
+        resized_height=height,
+        resized_width=int(height / tiles[0].shape[0] * tiles[0].shape[1]),
+    )
 
     for tile in tiles:
         best_matching_frames.append(
@@ -63,6 +71,7 @@ def get_best_matching_frames(
 def get_best_matching_frame_for_tile(
     frames: list[NDArray[np.uint8]], tile: NDArray[np.uint8]
 ) -> NDArray[np.uint8]:
-    similarities = [mean_color_similarity(img_a=frame, img_b=tile) for frame in frames]
+    frames_nparray = np.array(frames)
+    similarities = mean_color_similarities(images=frames_nparray, image_to_compare=tile)
     best_similarity = max(similarities)
     return frames[similarities.index(best_similarity)]

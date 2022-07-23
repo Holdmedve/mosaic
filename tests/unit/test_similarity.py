@@ -1,4 +1,6 @@
-from project.similarity import mean_color_similarity
+import numpy as np
+
+from project.similarity import mean_color_similarities, mean_color_similarity
 from tests.utils import black_img, green_img, red_img, white_img
 
 
@@ -22,3 +24,14 @@ def test__mean_color_similarity__red_and_green_are_more_similar_than_black_and_w
     black_white_similairity = mean_color_similarity(white_img(), black_img())
 
     assert red_green_similarity > black_white_similairity
+
+
+def test__mean_color_similarities__returns_expected_similarities() -> None:
+    images = np.array([black_img(), white_img()], dtype=np.uint8)
+    image_to_compare = black_img()
+
+    similarities = mean_color_similarities(
+        images=images, image_to_compare=image_to_compare
+    )
+
+    assert similarities == (1.0, 0.0)
