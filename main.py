@@ -18,7 +18,7 @@ TEMP_CONTENT_PATH = "/tmp"
 
 @app.route("/")
 def root() -> str:
-    squares = [2**x for x in range(10, 13)]
+    squares = [2**x for x in range(10, 14)]
     return render_template("index.html", tile_count_values=squares)
 
 
@@ -38,7 +38,7 @@ def create_mosaic() -> Response:
             original_image_path=image_path,
             video_path=video_path,
             mosaic_tile_count=tile_count,
-            max_frames_to_match=100,
+            max_frames_to_match=1000,
         )
     )
     mosaic_file_name = f"{uuid.uuid1()}.jpg"
