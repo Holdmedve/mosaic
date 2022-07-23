@@ -18,7 +18,7 @@ TEMP_CONTENT_PATH = "/tmp"
 
 @app.route("/")
 def root() -> str:
-    squares = [x**2 for x in range(32, 64)]
+    squares = [2**x for x in range(10, 13)]
     return render_template("index.html", tile_count_values=squares)
 
 
@@ -41,7 +41,7 @@ def create_mosaic() -> Response:
             max_frames_to_match=100,
         )
     )
-    mosaic_file_name = f"{uuid.uuid1()}.png"
+    mosaic_file_name = f"{uuid.uuid1()}.jpg"
     mosaic_file_path = f"{TEMP_CONTENT_PATH}/{mosaic_file_name}"
     cv2.imwrite(filename=mosaic_file_path, img=mosaic)
 
