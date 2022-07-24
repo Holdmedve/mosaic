@@ -33,18 +33,6 @@ def split_image_into_tiles(
 def stitch_grid_of_images_together(
     images: list[list[NDArray[np.uint8]]],
 ) -> NDArray[np.uint8]:
-    result: NDArray[np.uint8]
 
-    for x in range(len(images)):
-        row: NDArray[np.uint8]
-        for y in range(len(images[0])):
-            if y == 0:
-                row = images[x][y]
-            else:
-                row = np.concatenate((row, images[x][y]), axis=1)
-        if x == 0:
-            result = row
-        else:
-            result = np.concatenate((result, row), axis=0)
-
-    return result
+    rows = [np.hstack(row_of_images) for row_of_images in images]
+    return np.vstack(rows)

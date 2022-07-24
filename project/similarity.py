@@ -17,12 +17,14 @@ def mean_color_similarity(img_a: Image, img_b: Image) -> float:
 def mean_color_similarities(
     images: NDArray, image_to_compare: NDArray
 ) -> tuple[float, ...]:
-    means = images.mean(axis=1)
-    means = means.mean(axis=1)
+    mean_color_of_images = images.mean(axis=1).mean(axis=1)
     mean_to_compare = image_to_compare.mean(axis=(0, 1))
 
+    distances = [
+        np.sqrt(((mean - mean_to_compare) ** 2).sum(axis=0))
+        for mean in mean_color_of_images
+    ]
     max_possible_distance = 255 * np.sqrt(3)
-    distances = [np.sqrt(((mean - mean_to_compare) ** 2).sum(axis=0)) for mean in means]
     raw_similarities = [1 - distance / max_possible_distance for distance in distances]
 
     return tuple(
