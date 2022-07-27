@@ -1,4 +1,6 @@
 MUST:
+- optimize distance calculation
+    use numpy array instead of list comprehension
 - use container registry, github actions takes ages to build image every time
 - look through code with singe responsibility, level of abstraction in mind
 - create test that runs after deploy

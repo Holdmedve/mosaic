@@ -26,7 +26,7 @@ def test__mean_color_similarity__red_and_green_are_more_similar_than_black_and_w
     assert red_green_similarity > black_white_similairity
 
 
-def test__mean_color_similarities__returns_expected_similarities() -> None:
+def test__mean_color_similarities__black_is_similar_to_black_than_black_to_white() -> None:
     images = np.array([black_img(), white_img()], dtype=np.uint8)
     image_to_compare = black_img()
 
@@ -34,4 +34,4 @@ def test__mean_color_similarities__returns_expected_similarities() -> None:
         images=images, image_to_compare=image_to_compare
     )
 
-    assert similarities == (1.0, 0.0)
+    assert similarities[0] > similarities[1]

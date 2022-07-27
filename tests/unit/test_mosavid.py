@@ -1,7 +1,7 @@
 from project.helpers import get_random_non_negative_integers
 from project.mosavid import (
     generate_mosaic,
-    get_best_matching_frame_for_tile,
+    get_best_matching_frame_idx_for_tile,
 )
 
 from project.types import Config
@@ -23,7 +23,7 @@ def test__create_mosaic__given_a_config__returns_mosaic_with_roughly_same_ratio_
         config=Config(
             video_path=TEST_VIDEO_PATH,
             original_image_path=TEST_IMAGE_PATH,
-            mosaic_tile_count=64,
+            mosaic_tile_count=1024,
             max_frames_to_match=100,
         )
     )
@@ -34,10 +34,10 @@ def test__create_mosaic__given_a_config__returns_mosaic_with_roughly_same_ratio_
     assert expected_ratio == actual_ratio
 
 
-def test__get_best_matching_frame_for_tile__black_and_white_frame__black_tile__return_black_frame() -> None:
+def test__get_best_matching_frame_idx_for_tile__black_and_white_frame__black_tile__return_black_frame_idx() -> None:
     frames = [black_img(), white_img()]
     tile = black_img()
 
-    result = get_best_matching_frame_for_tile(frames=frames, tile=tile)
+    result = get_best_matching_frame_idx_for_tile(frames=frames, tile=tile)
 
-    assert (result == black_img()).any()
+    assert result == 0

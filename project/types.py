@@ -12,3 +12,6 @@ class Config:
     video_path: str
     max_frames_to_match: int
     mosaic_tile_count: int
+
+
+TILE_COUNT_TO_HEIGHT_DICT = {1024: 128, 2048: 96, 4096: 64, 8192: 32}

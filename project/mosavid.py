@@ -1,3 +1,4 @@
+import cv2
 import math
 import numpy as np
 from numpy.typing import NDArray
@@ -13,7 +14,7 @@ from project.image import (
     stitch_grid_of_images_together,
 )
 from project.similarity import mean_color_similarities
-from project.types import Config
+from project.types import Config, TILE_COUNT_TO_HEIGHT_DICT
 from project.video import get_resized_frames_at_indeces
 
 
@@ -52,26 +53,31 @@ def get_best_matching_frames(
     frame_indeces: tuple[int, ...], tiles: list[NDArray[np.uint8]], video_path: str
 ) -> list[NDArray[np.uint8]]:
     best_matching_frames = []
-    height = 100
+    height = TILE_COUNT_TO_HEIGHT_DICT[len(tiles)]
     frames = get_resized_frames_at_indeces(
         video_path=video_path,
         indeces=frame_indeces,
         resized_height=height,
         resized_width=int(height / tiles[0].shape[0] * tiles[0].shape[1]),
     )
+    tile_sized_frames = [
+        cv2.resize(src=frame, dsize=(tiles[0].shape[0], tiles[0].shape[1]))
+        for frame in frames
+    ]
 
     for tile in tiles:
-        best_matching_frames.append(
-            get_best_matching_frame_for_tile(frames=frames, tile=tile)
-        )
+        best_matching_frame = frames[
+            get_best_matching_frame_idx_for_tile(frames=tile_sized_frames, tile=tile)
+        ]
+        best_matching_frames.append(best_matching_frame)
 
     return best_matching_frames
 
 
-def get_best_matching_frame_for_tile(
+def get_best_matching_frame_idx_for_tile(
     frames: list[NDArray[np.uint8]], tile: NDArray[np.uint8]
-) -> NDArray[np.uint8]:
+) -> int:
     frames_nparray = np.array(frames)
     similarities = mean_color_similarities(images=frames_nparray, image_to_compare=tile)
     best_similarity = max(similarities)
-    return frames[similarities.index(best_similarity)]
+    return similarities.index(best_similarity)

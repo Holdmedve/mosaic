@@ -3,7 +3,7 @@ import cv2
 
 from flask import Flask, render_template, request, send_from_directory, Response
 from project import mosavid
-from project.types import Config
+from project.types import TILE_COUNT_TO_HEIGHT_DICT, Config
 
 # from PIL import Image
 
@@ -18,8 +18,9 @@ TEMP_CONTENT_PATH = "/tmp"
 
 @app.route("/")
 def root() -> str:
-    squares = [2**x for x in range(10, 13)]
-    return render_template("index.html", tile_count_values=squares)
+    return render_template(
+        "index.html", tile_count_values=[TILE_COUNT_TO_HEIGHT_DICT.keys()]
+    )
 
 
 @app.route("/create_mosaic", methods=["POST"])
