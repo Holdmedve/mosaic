@@ -25,10 +25,3 @@ def mean_color_similarities(
         for mean in mean_color_of_images
     ]
     return tuple([-distance for distance in distances])
-
-    # max_possible_distance = 255 * np.sqrt(3)
-    # raw_similarities = [1 - distance / max_possible_distance for distance in distances]
-
-    # return tuple(
-    #     [max(min(raw_similarity, 1.0), 0) for raw_similarity in raw_similarities]
-    # )

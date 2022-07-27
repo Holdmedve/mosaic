@@ -23,9 +23,8 @@ def generate_mosaic(config: Config) -> NDArray[np.uint8]:
         image_path=config.original_image_path, tile_count=config.mosaic_tile_count
     )
     best_matches_list = get_best_matches_for_tiles(
-        video_path=config.video_path,
+        config=config,
         tiles=flatten_nested_list(original_tiles),
-        max_frames_to_match=config.max_frames_to_match,
     )
     best_matches_grid = reshape_flat_list_to_nested(
         elements=best_matches_list, num_rows=math.isqrt(config.mosaic_tile_count)
@@ -35,27 +34,27 @@ def generate_mosaic(config: Config) -> NDArray[np.uint8]:
 
 
 def get_best_matches_for_tiles(
-    video_path: str, tiles: list[NDArray[np.uint8]], max_frames_to_match: int
+    config: Config, tiles: list[NDArray[np.uint8]]
 ) -> list[NDArray[np.uint8]]:
-    num_total_frames = get_num_total_frames(video_path=video_path)
+    num_total_frames = get_num_total_frames(video_path=config.video_path)
 
-    num_frames_to_match = min(num_total_frames, max_frames_to_match)
+    num_frames_to_match = min(num_total_frames, config.max_frames_to_match)
     frame_indeces = get_random_non_negative_integers(
         range_max=num_total_frames,
         num_integers=num_frames_to_match,
         duplicates_allowed=False,
     )
 
-    return get_best_matching_frames(frame_indeces, tiles, video_path)
+    return get_best_matching_frames(frame_indeces, tiles, config)
 
 
 def get_best_matching_frames(
-    frame_indeces: tuple[int, ...], tiles: list[NDArray[np.uint8]], video_path: str
+    frame_indeces: tuple[int, ...], tiles: list[NDArray[np.uint8]], config: Config
 ) -> list[NDArray[np.uint8]]:
     best_matching_frames = []
-    height = TILE_COUNT_TO_HEIGHT_DICT[len(tiles)]
+    height = TILE_COUNT_TO_HEIGHT_DICT[config.mosaic_tile_count]
     frames = get_resized_frames_at_indeces(
-        video_path=video_path,
+        video_path=config.video_path,
         indeces=frame_indeces,
         resized_height=height,
         resized_width=int(height / tiles[0].shape[0] * tiles[0].shape[1]),

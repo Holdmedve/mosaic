@@ -1,13 +1,7 @@
-FROM cypress/included:9.6.0
+FROM python:3.9-slim
 
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6  -y
-RUN apt-get install python3.9 python3-pip -y
-
-WORKDIR /home
-RUN mkdir /home/node_modules
-WORKDIR /home/node_modules
-RUN npm i cypress-file-upload --save
 
 WORKDIR /
 COPY test_requirements.txt /test_requirements.txt

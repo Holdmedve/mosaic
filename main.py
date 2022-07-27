@@ -19,7 +19,7 @@ TEMP_CONTENT_PATH = "/tmp"
 @app.route("/")
 def root() -> str:
     return render_template(
-        "index.html", tile_count_values=[TILE_COUNT_TO_HEIGHT_DICT.keys()]
+        "index.html", tile_count_values=list(TILE_COUNT_TO_HEIGHT_DICT.keys())
     )
 
 
