@@ -14,4 +14,4 @@ class Config:
     mosaic_tile_count: int
 
 
-TILE_COUNT_TO_HEIGHT_DICT = {1024: 128, 2048: 112, 4096: 96, 8192: 80}
+TILE_COUNT_TO_HEIGHT_DICT = {1024: 128, 2048: 96, 4096: 64, 8192: 32}
