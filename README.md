@@ -4,7 +4,7 @@ this web app creates a photo mosaic using frames taken from a video
 
 ##
 
-live demo website [HERE](https://mosavid.ew.r.appspot.com)
+demo website <a href="https://mosavid.ew.r.appspot.com" target="_blank">HERE</a>
 
 ## example output
 ![gandalf_mozaik](example_output/gandalf_mozaik.jpg)
